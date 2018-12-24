@@ -1009,6 +1009,9 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 	  while ((nl = strchr (msg, '\n')))
 	    {
 	      int msglen = nl + 1 - msg;
+	      /* This assertion is solely to avoid a warning from
+		 gcc's -Wformat-overflow=.  */
+	      assert (msglen < 4096);
 	      printf ("  %.*s", msglen, msg);
 	      msg = nl + 1;
 	    }
