@@ -120,8 +120,8 @@ compare exp out || fail=1
 # Before the fix in http://debbugs.gnu.org/22067,
 # this test would trigger an infinite loop bug.
 mkfifo fifo
-printf '%*s-a' 1000000 > a
-printf '%*s-b' 1000000 > b
+printf '%1000000s-a' > a
+printf '%1000000s-b' > b
 head -c 10 < fifo > /dev/null &
 diff --color=always ---presume-output-tty a b > fifo
 test $? = 141 || fail=1
