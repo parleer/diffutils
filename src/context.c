@@ -43,8 +43,9 @@ print_context_label (char const *mark,
 		     char const *name,
 		     char const *label)
 {
+  set_color_context (HEADER_CONTEXT);
   if (label)
-    fprintf (outfile, "%s %s\n", mark, label);
+    fprintf (outfile, "%s %s", mark, label);
   else
     {
       char buf[MAX (INT_STRLEN_BOUND (int) + 32,
@@ -71,8 +72,10 @@ print_context_label (char const *mark,
 	      sprintf (buf, "%"PRIuMAX".%.9d", sec, nsec);
 	    }
 	}
-      fprintf (outfile, "%s %s\t%s\n", mark, name, buf);
+      fprintf (outfile, "%s %s\t%s", mark, name, buf);
     }
+  set_color_context (RESET_CONTEXT);
+  putc ('\n', outfile);
 }
 
 /* Print a header for a context diff, with the file names and dates.  */
@@ -80,7 +83,6 @@ print_context_label (char const *mark,
 void
 print_context_header (struct file_data inf[], char const *const *names, bool unidiff)
 {
-  set_color_context (HEADER_CONTEXT);
   if (unidiff)
     {
       print_context_label ("---", &inf[0], names[0], file_label[0]);
@@ -91,7 +93,6 @@ print_context_header (struct file_data inf[], char const *const *names, bool uni
       print_context_label ("***", &inf[0], names[0], file_label[0]);
       print_context_label ("---", &inf[1], names[1], file_label[1]);
     }
-  set_color_context (RESET_CONTEXT);
 }
 
 /* Print an edit script in context format.  */
@@ -219,11 +220,10 @@ pr_context_hunk (struct change *hunk)
     {
       struct change *next = hunk;
 
-      if (first0 <= last0)
-        set_color_context (DELETE_CONTEXT);
-
       for (i = first0; i <= last0; i++)
 	{
+	  set_color_context (DELETE_CONTEXT);
+
 	  /* Skip past changes that apply (in file 0)
 	     only to lines before line I.  */
 
@@ -241,8 +241,7 @@ pr_context_hunk (struct change *hunk)
               prefix = (next->inserted > 0 ? "!" : "-");
             }
 	  print_1_line_nl (prefix, &files[0].linbuf[i], true);
-          if (i == last0)
-            set_color_context (RESET_CONTEXT);
+          set_color_context (RESET_CONTEXT);
           if (files[0].linbuf[i + 1][-1] == '\n')
             putc ('\n', out);
 	}
@@ -259,11 +258,10 @@ pr_context_hunk (struct change *hunk)
     {
       struct change *next = hunk;
 
-      if (first1 <= last1)
-        set_color_context (ADD_CONTEXT);
-
       for (i = first1; i <= last1; i++)
 	{
+	  set_color_context (ADD_CONTEXT);
+
 	  /* Skip past changes that apply (in file 1)
 	     only to lines before line I.  */
 
@@ -281,8 +279,7 @@ pr_context_hunk (struct change *hunk)
               prefix = (next->deleted > 0 ? "!" : "+");
             }
 	  print_1_line_nl (prefix, &files[1].linbuf[i], true);
-          if (i == last1)
-            set_color_context (RESET_CONTEXT);
+          set_color_context (RESET_CONTEXT);
           if (files[1].linbuf[i + 1][-1] == '\n')
             putc ('\n', out);
 	}
@@ -390,19 +387,17 @@ pr_unidiff_hunk (struct change *hunk)
 	  /* For each difference, first output the deleted part. */
 
 	  k = next->deleted;
-          if (k)
-            set_color_context (DELETE_CONTEXT);
 
 	  while (k--)
 	    {
 	      char const * const *line = &files[0].linbuf[i++];
+	      set_color_context (DELETE_CONTEXT);
 	      putc ('-', out);
 	      if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
 		putc ('\t', out);
 	      print_1_line_nl (NULL, line, true);
 
-              if (!k)
-                set_color_context (RESET_CONTEXT);
+	      set_color_context (RESET_CONTEXT);
 
               if (line[1][-1] == '\n')
                 putc ('\n', out);
@@ -411,19 +406,17 @@ pr_unidiff_hunk (struct change *hunk)
 	  /* Then output the inserted part. */
 
 	  k = next->inserted;
-          if (k)
-            set_color_context (ADD_CONTEXT);
 
           while (k--)
 	    {
 	      char const * const *line = &files[1].linbuf[j++];
+	      set_color_context (ADD_CONTEXT);
 	      putc ('+', out);
 	      if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
 		putc ('\t', out);
 	      print_1_line_nl (NULL, line, true);
 
-              if (!k)
-                set_color_context (RESET_CONTEXT);
+              set_color_context (RESET_CONTEXT);
 
               if (line[1][-1] == '\n')
                 putc ('\n', out);

@@ -9,6 +9,10 @@ GNU diffutils NEWS                                    -*- outline -*-
     diff -a --strip-trailing-cr <(printf '\r') <(echo a)
   [bug introduced in 2.8 with addition of the --strip-trailing-cr option]
 
+** Improvements
+
+  diff --color now produces output compatible with less -R.
+
 
 * Noteworthy changes in release 3.6 (2017-05-21) [stable]
 

@@ -29,9 +29,9 @@ gen_exp_u()
     local de=$(printf "$e[${de}m")
     local ln=$(printf "$e[${ln}m")
     printf '%s' \
-"$hd--- a$tab$epoch_plus
-+++ b$tab$epoch_plus
-$rs${ln}@@ -1 +1 @@$rs
+"$hd--- a$tab$epoch_plus$rs
+$hd+++ b$tab$epoch_plus$rs
+${ln}@@ -1 +1 @@$rs
 $de-a$rs
 $ad+b$rs
 "
@@ -46,9 +46,9 @@ gen_exp_c()
     local de=$(printf "$e[${de}m")
     local ln=$(printf "$e[${ln}m")
     printf '%s' \
-"$hd*** a$tab$epoch_posix_1003_1_2001
---- b$tab$epoch_posix_1003_1_2001
-$rs***************
+"$hd*** a$tab$epoch_posix_1003_1_2001$rs
+$hd--- b$tab$epoch_posix_1003_1_2001$rs
+***************
 $ln*** 1 ****$rs
 $de! a$rs
 $ln--- 1 ----$rs
