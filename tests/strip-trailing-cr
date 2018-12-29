@@ -1,0 +1,20 @@
+#!/bin/sh
+# Before diff-3.7, this would provoke a UMR
+
+. "${srcdir=.}/init.sh"; path_prepend_ ../src
+
+fail=0
+
+require_valgrind_
+
+printf '\r' > r || framework_failure_
+echo b > b || framework_failure_
+
+for opt in '' u c Dfoo; do
+  returns_ 1 valgrind --quiet --error-exitcode=3 \
+    diff -a$opt --strip-trailing-cr r b > out 2> err || fail=1
+done
+
+compare /dev/null err || fail=1
+
+Exit $fail

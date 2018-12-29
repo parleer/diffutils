@@ -21,6 +21,7 @@ TESTS = \
   stdin \
   strcoll-0-names \
   filename-quoting \
+  strip-trailing-cr \
   colors
 
 XFAIL_TESTS = large-subopt
