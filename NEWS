@@ -2,6 +2,13 @@ GNU diffutils NEWS                                    -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Bug fixes
+
+  diff --strip-trailing-cr with a single CR byte in one input file
+  would provoke an uninitialized memory read, e.g.,
+    diff -a --strip-trailing-cr <(printf '\r') <(echo a)
+  [bug introduced in 2.8 with addition of the --strip-trailing-cr option]
+
 
 * Noteworthy changes in release 3.6 (2017-05-21) [stable]
 
