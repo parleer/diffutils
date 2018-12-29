@@ -80,7 +80,6 @@ TESTS_ENVIRONMENT =					\
   PREFERABLY_POSIX_SHELL='$(PREFERABLY_POSIX_SHELL)'	\
   REPLACE_GETCWD=$(REPLACE_GETCWD)			\
   PATH='$(abs_top_builddir)/src$(PATH_SEPARATOR)'"$$PATH"	\
-  stderr_fileno_=9					\
   ; 9>&2
 
 LOG_COMPILER= $(SHELL)
