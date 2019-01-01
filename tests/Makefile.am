@@ -27,7 +27,7 @@ TESTS = \
 XFAIL_TESTS = large-subopt
 
 EXTRA_DIST = \
-  $(TESTS) init.sh t-local.sh envvar-check \
+  $(TESTS) init.cfg init.sh t-local.sh envvar-check \
   large-subopt.in1 \
   large-subopt.in2
 
