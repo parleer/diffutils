@@ -2,6 +2,15 @@ GNU diffutils NEWS                                    -*- outline -*-
 
 * Noteworthy changes in release ?.? (????-??-??) [?]
 
+** Incompatible changes
+
+  diff no longer treats a closed stdin as representing an absent file
+  in usage like 'diff --new-file - foo <&-'.  This feature was rarely
+  if ever used and was not portable to POSIX platforms that reopen
+  stdin on exec, such as SELinux if the process underwent an AT_SECURE
+  transition, or HP-UX even if not setuid.
+  [bug#33965 introduced in 2.8]
+
 
 * Noteworthy changes in release 3.7 (2018-12-31) [stable]
 

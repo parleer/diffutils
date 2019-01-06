@@ -37,6 +37,7 @@
 #include <progname.h>
 #include <sh-quote.h>
 #include <stat-time.h>
+#include <stdopen.h>
 #include <timespec.h>
 #include <version-etc.h>
 #include <xalloc.h>
@@ -297,6 +298,9 @@ main (int argc, char **argv)
   re_set_syntax (RE_SYNTAX_GREP | RE_NO_POSIX_BACKTRACKING);
   excluded = new_exclude ();
   presume_output_tty = false;
+  int stdopen_errno = stdopen ();
+  if (stdopen_errno != 0)
+    error (EXIT_TROUBLE, stdopen_errno, "standard file descriptors");
 
   /* Decode the options.  */
 
@@ -1172,13 +1176,6 @@ compare_files (struct comparison const *parent,
 	      cmp.file[f].desc = STDIN_FILENO;
 	      if (binary && ! isatty (STDIN_FILENO))
 		set_binary_mode (STDIN_FILENO, O_BINARY);
-#ifdef __hpux
-	      /* Recognize file descriptors closed by the parent on HP-UX.  */
-	      int flags = fcntl (STDIN_FILENO, F_GETFL, NULL);
-	      if (flags >= 0 && (flags & FD_CLOEXEC) != 0)
-		cmp.file[f].desc = ERRNO_ENCODE (EBADF);
-	      else
-#endif
 	      if (fstat (STDIN_FILENO, &cmp.file[f].stat) != 0)
 		cmp.file[f].desc = ERRNO_ENCODE (errno);
 	      else

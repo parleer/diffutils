@@ -1796,8 +1796,7 @@ second position.)  To do this, use the @option{--new-file}
 (@option{-N}) option.  This option affects command-line arguments as
 well as files found via directory traversal; for example, @samp{diff
 -N a b} treats @file{a} as empty if @file{a} does not exist but
-@file{b} does, and similarly @samp{diff -N - b} treats standard input
-as empty if it is closed but @file{b} exists.
+@file{b} does.
 
 If the older directory contains large files that are not in
 the newer directory, you can make the patch smaller by using the
