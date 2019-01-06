@@ -343,12 +343,12 @@ User-visible changes in version 2.4:
       printed according to the printf specification.
       E.g. '%5df' prints the number of the first line in the
       group in the old file using the "%5d" format.
-	e: line number just before the group in old file; equals f - 1
-	f: first line number in group in the old file
-	l: last line number in group in the old file
-	m: line number just after the group in old file; equals l + 1
-	n: number of lines in group in the old file; equals l - f + 1
-	E, F, L, M, N: likewise, for lines in the new file
+        e: line number just before the group in old file; equals f - 1
+        f: first line number in group in the old file
+        l: last line number in group in the old file
+        m: line number just after the group in old file; equals l + 1
+        n: number of lines in group in the old file; equals l - f + 1
+        E, F, L, M, N: likewise, for lines in the new file
   %(A=B?T:E)
       If A equals B then T else E.  A and B are each either a decimal
       constant or a single letter interpreted as above.  T and E are

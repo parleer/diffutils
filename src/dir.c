@@ -75,7 +75,7 @@ dir_read (struct file_data const *dir, struct dirdata *dirdata)
       /* Open the directory and check for errors.  */
       register DIR *reading = opendir (dir->name);
       if (!reading)
-	return false;
+        return false;
 
       /* Initialize the table of filenames.  */
 
@@ -84,44 +84,44 @@ dir_read (struct file_data const *dir, struct dirdata *dirdata)
       dirdata->data = data = xmalloc (data_alloc);
 
       /* Read the directory entries, and insert the subfiles
-	 into the 'data' table.  */
+         into the 'data' table.  */
 
       while ((errno = 0, (next = readdir (reading)) != 0))
-	{
-	  char *d_name = next->d_name;
-	  size_t d_size = _D_EXACT_NAMLEN (next) + 1;
+        {
+          char *d_name = next->d_name;
+          size_t d_size = _D_EXACT_NAMLEN (next) + 1;
 
-	  /* Ignore "." and "..".  */
-	  if (d_name[0] == '.'
-	      && (d_name[1] == 0 || (d_name[1] == '.' && d_name[2] == 0)))
-	    continue;
+          /* Ignore "." and "..".  */
+          if (d_name[0] == '.'
+              && (d_name[1] == 0 || (d_name[1] == '.' && d_name[2] == 0)))
+            continue;
 
-	  if (excluded_file_name (excluded, d_name))
-	    continue;
+          if (excluded_file_name (excluded, d_name))
+            continue;
 
-	  while (data_alloc < data_used + d_size)
-	    {
-	      if (PTRDIFF_MAX / 2 <= data_alloc)
-		xalloc_die ();
-	      dirdata->data = data = xrealloc (data, data_alloc *= 2);
-	    }
+          while (data_alloc < data_used + d_size)
+            {
+              if (PTRDIFF_MAX / 2 <= data_alloc)
+                xalloc_die ();
+              dirdata->data = data = xrealloc (data, data_alloc *= 2);
+            }
 
-	  memcpy (data + data_used, d_name, d_size);
-	  data_used += d_size;
-	  nnames++;
-	}
+          memcpy (data + data_used, d_name, d_size);
+          data_used += d_size;
+          nnames++;
+        }
       if (errno)
-	{
-	  int e = errno;
-	  closedir (reading);
-	  errno = e;
-	  return false;
-	}
+        {
+          int e = errno;
+          closedir (reading);
+          errno = e;
+          return false;
+        }
 #if CLOSEDIR_VOID
       closedir (reading);
 #else
       if (closedir (reading) != 0)
-	return false;
+        return false;
 #endif
     }
 
@@ -154,7 +154,7 @@ compare_collated (char const *name1, char const *name2)
   if (errno)
     {
       error (0, errno, _("cannot compare file names '%s' and '%s'"),
-	     name1, name2);
+             name1, name2);
       longjmp (failed_locale_specific_sorting, 1);
     }
   return r;
@@ -169,7 +169,7 @@ compare_names (char const *name1, char const *name2)
     {
       int diff = compare_collated (name1, name2);
       if (diff || ignore_file_name_case)
-	return diff;
+        return diff;
     }
   return file_name_cmp (name1, name2);
 }
@@ -188,7 +188,7 @@ compare_names_for_qsort (void const *file1, void const *file2)
     {
       int diff = compare_collated (name1, name2);
       if (diff)
-	return diff;
+        return diff;
     }
   return file_name_cmp (name1, name2);
 }
@@ -212,8 +212,8 @@ compare_names_for_qsort (void const *file1, void const *file2)
 
 int
 diff_dirs (struct comparison const *cmp,
-	   int (*handle_file) (struct comparison const *,
-			       char const *, char const *))
+           int (*handle_file) (struct comparison const *,
+                               char const *, char const *))
 {
   struct dirdata dirdata[2];
   int volatile val = EXIT_SUCCESS;
@@ -223,7 +223,7 @@ diff_dirs (struct comparison const *cmp,
       && (cmp->file[1].desc == -1 || dir_loop (cmp, 1)))
     {
       error (0, 0, _("%s: recursive directory loop"),
-	     cmp->file[cmp->file[0].desc == -1].name);
+             cmp->file[cmp->file[0].desc == -1].name);
       return EXIT_TROUBLE;
     }
 
@@ -231,8 +231,8 @@ diff_dirs (struct comparison const *cmp,
   for (i = 0; i < 2; i++)
     if (! dir_read (&cmp->file[i], &dirdata[i]))
       {
-	perror_with_name (cmp->file[i].name);
-	val = EXIT_TROUBLE;
+        perror_with_name (cmp->file[i].name);
+        val = EXIT_TROUBLE;
       }
 
   if (val == EXIT_SUCCESS)
@@ -244,73 +244,73 @@ diff_dirs (struct comparison const *cmp,
       /* Use locale-specific sorting if possible, else native byte order.  */
       locale_specific_sorting = true;
       if (setjmp (failed_locale_specific_sorting))
-	locale_specific_sorting = false;
+        locale_specific_sorting = false;
 
       /* Sort the directories.  */
       for (i = 0; i < 2; i++)
-	qsort (names[i], dirdata[i].nnames, sizeof *dirdata[i].names,
-	       compare_names_for_qsort);
+        qsort (names[i], dirdata[i].nnames, sizeof *dirdata[i].names,
+               compare_names_for_qsort);
 
       /* If '-S name' was given, and this is the topmost level of comparison,
-	 ignore all file names less than the specified starting name.  */
+         ignore all file names less than the specified starting name.  */
 
       if (starting_file && ! cmp->parent)
-	{
-	  while (*names[0] && compare_names (*names[0], starting_file) < 0)
-	    names[0]++;
-	  while (*names[1] && compare_names (*names[1], starting_file) < 0)
-	    names[1]++;
-	}
+        {
+          while (*names[0] && compare_names (*names[0], starting_file) < 0)
+            names[0]++;
+          while (*names[1] && compare_names (*names[1], starting_file) < 0)
+            names[1]++;
+        }
 
       /* Loop while files remain in one or both dirs.  */
       while (*names[0] || *names[1])
-	{
-	  /* Compare next name in dir 0 with next name in dir 1.
-	     At the end of a dir,
-	     pretend the "next name" in that dir is very large.  */
-	  int nameorder = (!*names[0] ? 1 : !*names[1] ? -1
-			   : compare_names (*names[0], *names[1]));
+        {
+          /* Compare next name in dir 0 with next name in dir 1.
+             At the end of a dir,
+             pretend the "next name" in that dir is very large.  */
+          int nameorder = (!*names[0] ? 1 : !*names[1] ? -1
+                           : compare_names (*names[0], *names[1]));
 
-	  /* Prefer a file_name_cmp match if available.  This algorithm is
-	     O(N**2), where N is the number of names in a directory
-	     that compare_names says are all equal, but in practice N
-	     is so small it's not worth tuning.  */
-	  if (nameorder == 0 && ignore_file_name_case)
-	    {
-	      int raw_order = file_name_cmp (*names[0], *names[1]);
-	      if (raw_order != 0)
-		{
-		  int greater_side = raw_order < 0;
-		  int lesser_side = 1 - greater_side;
-		  char const **lesser = names[lesser_side];
-		  char const *greater_name = *names[greater_side];
-		  char const **p;
+          /* Prefer a file_name_cmp match if available.  This algorithm is
+             O(N**2), where N is the number of names in a directory
+             that compare_names says are all equal, but in practice N
+             is so small it's not worth tuning.  */
+          if (nameorder == 0 && ignore_file_name_case)
+            {
+              int raw_order = file_name_cmp (*names[0], *names[1]);
+              if (raw_order != 0)
+                {
+                  int greater_side = raw_order < 0;
+                  int lesser_side = 1 - greater_side;
+                  char const **lesser = names[lesser_side];
+                  char const *greater_name = *names[greater_side];
+                  char const **p;
 
-		  for (p = lesser + 1;
-		       *p && compare_names (*p, greater_name) == 0;
-		       p++)
-		    {
-		      int c = file_name_cmp (*p, greater_name);
-		      if (0 <= c)
-			{
-			  if (c == 0)
-			    {
-			      memmove (lesser + 1, lesser,
-				       (char *) p - (char *) lesser);
-			      *lesser = greater_name;
-			    }
-			  break;
-			}
-		    }
-		}
-	    }
+                  for (p = lesser + 1;
+                       *p && compare_names (*p, greater_name) == 0;
+                       p++)
+                    {
+                      int c = file_name_cmp (*p, greater_name);
+                      if (0 <= c)
+                        {
+                          if (c == 0)
+                            {
+                              memmove (lesser + 1, lesser,
+                                       (char *) p - (char *) lesser);
+                              *lesser = greater_name;
+                            }
+                          break;
+                        }
+                    }
+                }
+            }
 
-	  int v1 = (*handle_file) (cmp,
-				   0 < nameorder ? 0 : *names[0]++,
-				   nameorder < 0 ? 0 : *names[1]++);
-	  if (val < v1)
-	    val = v1;
-	}
+          int v1 = (*handle_file) (cmp,
+                                   0 < nameorder ? 0 : *names[0]++,
+                                   nameorder < 0 ? 0 : *names[1]++);
+          if (val < v1)
+            val = v1;
+        }
     }
 
   for (i = 0; i < 2; i++)
@@ -357,25 +357,25 @@ find_dir_file_pathname (char const *dir, char const *file)
       filedata.desc = 0;
 
       if (dir_read (&filedata, &dirdata))
-	{
-	  locale_specific_sorting = true;
-	  if (setjmp (failed_locale_specific_sorting))
-	    match = file; /* longjmp may mess up MATCH.  */
-	  else
-	    {
-	      for (char const **p = dirdata.names; *p; p++)
-		if (compare_names (*p, file) == 0)
-		  {
-		    if (file_name_cmp (*p, file) == 0)
-		      {
-			match = *p;
-			break;
-		      }
-		    if (match == file)
-		      match = *p;
-		  }
-	    }
-	}
+        {
+          locale_specific_sorting = true;
+          if (setjmp (failed_locale_specific_sorting))
+            match = file; /* longjmp may mess up MATCH.  */
+          else
+            {
+              for (char const **p = dirdata.names; *p; p++)
+                if (compare_names (*p, file) == 0)
+                  {
+                    if (file_name_cmp (*p, file) == 0)
+                      {
+                        match = *p;
+                        break;
+                      }
+                    if (match == file)
+                      match = *p;
+                  }
+            }
+        }
     }
 
   val = file_name_concat (dir, match, NULL);

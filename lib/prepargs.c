@@ -52,16 +52,16 @@ prepend_args (char const *options, char *buf, char **argv)
   for (;;)
     {
       while (ISSPACE ((unsigned char) *o))
-	o++;
+        o++;
       if (!*o)
-	return n;
+        return n;
       if (argv)
-	argv[n] = b;
+        argv[n] = b;
       n++;
 
       do
-	if ((*b++ = *o++) == '\\' && *o)
-	  b[-1] = *o++;
+        if ((*b++ = *o++) == '\\' && *o)
+          b[-1] = *o++;
       while (*o && ! ISSPACE ((unsigned char) *o));
 
       *b++ = '\0';
@@ -86,6 +86,6 @@ prepend_default_options (char const *options, int *pargc, char ***pargv)
       *pp++ = *argv++;
       pp += prepend_args (options, buf, pp);
       while ((*pp++ = *argv++))
-	continue;
+        continue;
     }
 }

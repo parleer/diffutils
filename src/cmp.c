@@ -117,7 +117,7 @@ try_help (char const *reason_msgid, char const *operand)
   if (reason_msgid)
     error (0, 0, _(reason_msgid), operand);
   die (EXIT_TROUBLE, 0,
-	 _("Try '%s --help' for more information."), program_name);
+         _("Try '%s --help' for more information."), program_name);
 }
 
 static char const valid_suffixes[] = "kKMGTPEZY0";
@@ -133,7 +133,7 @@ specify_ignore_initial (int f, char **argptr, char delimiter)
   char const *arg = *argptr;
   strtol_error e = xstrtoumax (arg, argptr, 0, &val, valid_suffixes);
   if (! (e == LONGINT_OK
-	 || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
+         || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
       || TYPE_MAXIMUM (off_t) < val)
     try_help ("invalid --ignore-initial value '%s'", arg);
   if (ignore_initial[f] < val)
@@ -177,7 +177,7 @@ usage (void)
   char const * const *p;
 
   printf (_("Usage: %s [OPTION]... FILE1 [FILE2 [SKIP1 [SKIP2]]]\n"),
-	  program_name);
+          program_name);
   printf ("%s\n", _("Compare two files byte by byte."));
   printf ("\n%s\n\n",
 _("The optional SKIP1 and SKIP2 specify the number of bytes to skip\n"
@@ -189,11 +189,11 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   for (p = option_help_msgid;  *p;  p++)
     printf ("  %s\n", _(*p));
   printf ("\n%s\n\n%s\n%s\n",
-	  _("SKIP values may be followed by the following multiplicative suffixes:\n\
+          _("SKIP values may be followed by the following multiplicative suffixes:\n\
 kB 1000, K 1024, MB 1,000,000, M 1,048,576,\n\
 GB 1,000,000,000, G 1,073,741,824, and so on for T, P, E, Z, Y."),
-	  _("If a FILE is '-' or missing, read standard input."),
-	  _("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."));
+          _("If a FILE is '-' or missing, read standard input."),
+          _("Exit status is 0 if inputs are the same, 1 if different, 2 if trouble."));
   emit_bug_reporting_address ();
 }
 
@@ -217,53 +217,53 @@ main (int argc, char **argv)
   /* Parse command line options.  */
 
   while ((c = getopt_long (argc, argv, "bci:ln:sv", long_options, 0))
-	 != -1)
+         != -1)
     switch (c)
       {
       case 'b':
       case 'c': /* 'c' is obsolescent as of diffutils 2.7.3 */
-	opt_print_bytes = true;
-	break;
+        opt_print_bytes = true;
+        break;
 
       case 'i':
-	specify_ignore_initial (0, &optarg, ':');
-	if (*optarg++ == ':')
-	  specify_ignore_initial (1, &optarg, 0);
-	else if (ignore_initial[1] < ignore_initial[0])
-	  ignore_initial[1] = ignore_initial[0];
-	break;
+        specify_ignore_initial (0, &optarg, ':');
+        if (*optarg++ == ':')
+          specify_ignore_initial (1, &optarg, 0);
+        else if (ignore_initial[1] < ignore_initial[0])
+          ignore_initial[1] = ignore_initial[0];
+        break;
 
       case 'l':
-	specify_comparison_type (type_all_diffs);
-	break;
+        specify_comparison_type (type_all_diffs);
+        break;
 
       case 'n':
-	{
-	  uintmax_t n;
-	  if (xstrtoumax (optarg, 0, 0, &n, valid_suffixes) != LONGINT_OK)
-	    try_help ("invalid --bytes value '%s'", optarg);
-	  if (n < bytes)
-	    bytes = n;
-	}
-	break;
+        {
+          uintmax_t n;
+          if (xstrtoumax (optarg, 0, 0, &n, valid_suffixes) != LONGINT_OK)
+            try_help ("invalid --bytes value '%s'", optarg);
+          if (n < bytes)
+            bytes = n;
+        }
+        break;
 
       case 's':
-	specify_comparison_type (type_status);
-	break;
+        specify_comparison_type (type_status);
+        break;
 
       case 'v':
-	version_etc (stdout, PROGRAM_NAME, PACKAGE_NAME, Version,
-		     AUTHORS, (char *) NULL);
-	check_stdout ();
-	return EXIT_SUCCESS;
+        version_etc (stdout, PROGRAM_NAME, PACKAGE_NAME, Version,
+                     AUTHORS, (char *) NULL);
+        check_stdout ();
+        return EXIT_SUCCESS;
 
       case HELP_OPTION:
-	usage ();
-	check_stdout ();
-	return EXIT_SUCCESS;
+        usage ();
+        check_stdout ();
+        return EXIT_SUCCESS;
 
       default:
-	try_help (0, 0);
+        try_help (0, 0);
       }
 
   if (optind == argc)
@@ -284,27 +284,27 @@ main (int argc, char **argv)
   for (int f = 0; f < 2; f++)
     {
       /* Two files with the same name and offset are identical.
-	 But wait until we open the file once, for proper diagnostics.  */
+         But wait until we open the file once, for proper diagnostics.  */
       if (f && ignore_initial[0] == ignore_initial[1]
-	  && file_name_cmp (file[0], file[1]) == 0)
-	return EXIT_SUCCESS;
+          && file_name_cmp (file[0], file[1]) == 0)
+        return EXIT_SUCCESS;
 
       if (STREQ (file[f], "-"))
-	{
-	  file_desc[f] = STDIN_FILENO;
-	  if (O_BINARY && ! isatty (STDIN_FILENO))
-	    set_binary_mode (STDIN_FILENO, O_BINARY);
-	}
+        {
+          file_desc[f] = STDIN_FILENO;
+          if (O_BINARY && ! isatty (STDIN_FILENO))
+            set_binary_mode (STDIN_FILENO, O_BINARY);
+        }
       else
-	file_desc[f] = open (file[f], O_RDONLY | O_BINARY, 0);
+        file_desc[f] = open (file[f], O_RDONLY | O_BINARY, 0);
 
       if (file_desc[f] < 0 || fstat (file_desc[f], stat_buf + f) != 0)
-	{
-	  if (file_desc[f] < 0 && comparison_type == type_status)
-	    exit (EXIT_TROUBLE);
-	  else
-	    die (EXIT_TROUBLE, errno, "%s", file[f]);
-	}
+        {
+          if (file_desc[f] < 0 && comparison_type == type_status)
+            exit (EXIT_TROUBLE);
+          else
+            die (EXIT_TROUBLE, errno, "%s", file[f]);
+        }
     }
 
   /* If the files are links to the same inode and have the same file position,
@@ -323,9 +323,9 @@ main (int argc, char **argv)
       struct stat outstat, nullstat;
 
       if (fstat (STDOUT_FILENO, &outstat) == 0
-	  && stat (NULL_DEVICE, &nullstat) == 0
-	  && 0 < same_file (&outstat, &nullstat))
-	comparison_type = type_no_stdout;
+          && stat (NULL_DEVICE, &nullstat) == 0
+          && 0 < same_file (&outstat, &nullstat))
+        comparison_type = type_no_stdout;
     }
 
   /* If only a return code is needed,
@@ -340,18 +340,18 @@ main (int argc, char **argv)
       off_t s0 = stat_buf[0].st_size - file_position (0);
       off_t s1 = stat_buf[1].st_size - file_position (1);
       if (s0 < 0)
-	s0 = 0;
+        s0 = 0;
       if (s1 < 0)
-	s1 = 0;
+        s1 = 0;
       if (s0 != s1 && MIN (s0, s1) < bytes)
-	exit (EXIT_FAILURE);
+        exit (EXIT_FAILURE);
     }
 
   /* Get the optimal block size of the files.  */
 
   buf_size = buffer_lcm (STAT_BLOCKSIZE (stat_buf[0]),
-			 STAT_BLOCKSIZE (stat_buf[1]),
-			 PTRDIFF_MAX - sizeof (word));
+                         STAT_BLOCKSIZE (stat_buf[1]),
+                         PTRDIFF_MAX - sizeof (word));
 
   /* Allocate word-aligned buffers, with space for sentinels at the end.  */
 
@@ -398,37 +398,37 @@ cmp (void)
       off_t byte_number_max = MIN (bytes, TYPE_MAXIMUM (off_t));
 
       for (f = 0; f < 2; f++)
-	if (S_ISREG (stat_buf[f].st_mode))
-	  {
-	    off_t file_bytes = stat_buf[f].st_size - file_position (f);
-	    if (file_bytes < byte_number_max)
-	      byte_number_max = file_bytes;
-	  }
+        if (S_ISREG (stat_buf[f].st_mode))
+          {
+            off_t file_bytes = stat_buf[f].st_size - file_position (f);
+            if (file_bytes < byte_number_max)
+              byte_number_max = file_bytes;
+          }
 
       for (offset_width = 1; (byte_number_max /= 10) != 0; offset_width++)
-	continue;
+        continue;
     }
 
   for (f = 0; f < 2; f++)
     {
       off_t ig = ignore_initial[f];
       if (ig && file_position (f) == -1)
-	{
-	  /* lseek failed; read and discard the ignored initial prefix.  */
-	  do
-	    {
-	      size_t bytes_to_read = MIN (ig, buf_size);
-	      size_t r = block_read (file_desc[f], buf0, bytes_to_read);
-	      if (r != bytes_to_read)
-		{
-		  if (r == SIZE_MAX)
-		    die (EXIT_TROUBLE, errno, "%s", file[f]);
-		  break;
-		}
-	      ig -= r;
-	    }
-	  while (ig);
-	}
+        {
+          /* lseek failed; read and discard the ignored initial prefix.  */
+          do
+            {
+              size_t bytes_to_read = MIN (ig, buf_size);
+              size_t r = block_read (file_desc[f], buf0, bytes_to_read);
+              if (r != bytes_to_read)
+                {
+                  if (r == SIZE_MAX)
+                    die (EXIT_TROUBLE, errno, "%s", file[f]);
+                  break;
+                }
+              ig -= r;
+            }
+          while (ig);
+        }
     }
 
   do
@@ -436,166 +436,166 @@ cmp (void)
       size_t bytes_to_read = buf_size;
 
       if (remaining != UINTMAX_MAX)
-	{
-	  if (remaining < bytes_to_read)
-	    bytes_to_read = remaining;
-	  remaining -= bytes_to_read;
-	}
+        {
+          if (remaining < bytes_to_read)
+            bytes_to_read = remaining;
+          remaining -= bytes_to_read;
+        }
 
       read0 = block_read (file_desc[0], buf0, bytes_to_read);
       if (read0 == SIZE_MAX)
-	die (EXIT_TROUBLE, errno, "%s", file[0]);
+        die (EXIT_TROUBLE, errno, "%s", file[0]);
       read1 = block_read (file_desc[1], buf1, bytes_to_read);
       if (read1 == SIZE_MAX)
-	die (EXIT_TROUBLE, errno, "%s", file[1]);
+        die (EXIT_TROUBLE, errno, "%s", file[1]);
 
       smaller = MIN (read0, read1);
 
       /* Optimize the common case where the buffers are the same.  */
       if (memcmp (buf0, buf1, smaller) == 0)
-	first_diff = smaller;
+        first_diff = smaller;
       else
-	{
-	  /* Insert sentinels for the block compare.  */
-	  buf0[read0] = ~buf1[read0];
-	  buf1[read1] = ~buf0[read1];
+        {
+          /* Insert sentinels for the block compare.  */
+          buf0[read0] = ~buf1[read0];
+          buf1[read1] = ~buf0[read1];
 
-	  first_diff = block_compare (buffer0, buffer1);
-	}
+          first_diff = block_compare (buffer0, buffer1);
+        }
 
       byte_number += first_diff;
       if (comparison_type == type_first_diff && first_diff != 0)
-	{
-	  line_number += count_newlines (buf0, first_diff);
-	  at_line_start = buf0[first_diff - 1] == '\n';
-	}
+        {
+          line_number += count_newlines (buf0, first_diff);
+          at_line_start = buf0[first_diff - 1] == '\n';
+        }
 
       if (first_diff < smaller)
-	{
-	  switch (comparison_type)
-	    {
-	    case type_first_diff:
-	      {
-		char byte_buf[INT_BUFSIZE_BOUND (off_t)];
-		char line_buf[INT_BUFSIZE_BOUND (off_t)];
-		char const *byte_num = offtostr (byte_number, byte_buf);
-		char const *line_num = offtostr (line_number, line_buf);
-		if (!opt_print_bytes)
-		  {
-		    /* See POSIX for this format.  This message is
-		       used only in the POSIX locale, so it need not
-		       be translated.  */
-		    static char const char_message[] =
-		      "%s %s differ: char %s, line %s\n";
+        {
+          switch (comparison_type)
+            {
+            case type_first_diff:
+              {
+                char byte_buf[INT_BUFSIZE_BOUND (off_t)];
+                char line_buf[INT_BUFSIZE_BOUND (off_t)];
+                char const *byte_num = offtostr (byte_number, byte_buf);
+                char const *line_num = offtostr (line_number, line_buf);
+                if (!opt_print_bytes)
+                  {
+                    /* See POSIX for this format.  This message is
+                       used only in the POSIX locale, so it need not
+                       be translated.  */
+                    static char const char_message[] =
+                      "%s %s differ: char %s, line %s\n";
 
-		    /* The POSIX rationale recommends using the word
-		       "byte" outside the POSIX locale.  Some gettext
-		       implementations translate even in the POSIX
-		       locale if certain other environment variables
-		       are set, so use "byte" if a translation is
-		       available, or if outside the POSIX locale.  */
-		    static char const byte_msgid[] =
-		      N_("%s %s differ: byte %s, line %s\n");
-		    char const *byte_message = _(byte_msgid);
-		    bool use_byte_message = (byte_message != byte_msgid
-					     || hard_locale_LC_MESSAGES);
+                    /* The POSIX rationale recommends using the word
+                       "byte" outside the POSIX locale.  Some gettext
+                       implementations translate even in the POSIX
+                       locale if certain other environment variables
+                       are set, so use "byte" if a translation is
+                       available, or if outside the POSIX locale.  */
+                    static char const byte_msgid[] =
+                      N_("%s %s differ: byte %s, line %s\n");
+                    char const *byte_message = _(byte_msgid);
+                    bool use_byte_message = (byte_message != byte_msgid
+                                             || hard_locale_LC_MESSAGES);
 
-		    printf (use_byte_message ? byte_message : char_message,
-			    file[0], file[1], byte_num, line_num);
-		  }
-		else
-		  {
-		    unsigned char c0 = buf0[first_diff];
-		    unsigned char c1 = buf1[first_diff];
-		    char s0[5];
-		    char s1[5];
-		    sprintc (s0, c0);
-		    sprintc (s1, c1);
-		    printf (_("%s %s differ: byte %s, line %s is %3o %s %3o %s\n"),
-			    file[0], file[1], byte_num, line_num,
-			    c0, s0, c1, s1);
-		  }
-	      }
-	      FALLTHROUGH;
-	    case type_status:
-	      return EXIT_FAILURE;
+                    printf (use_byte_message ? byte_message : char_message,
+                            file[0], file[1], byte_num, line_num);
+                  }
+                else
+                  {
+                    unsigned char c0 = buf0[first_diff];
+                    unsigned char c1 = buf1[first_diff];
+                    char s0[5];
+                    char s1[5];
+                    sprintc (s0, c0);
+                    sprintc (s1, c1);
+                    printf (_("%s %s differ: byte %s, line %s is %3o %s %3o %s\n"),
+                            file[0], file[1], byte_num, line_num,
+                            c0, s0, c1, s1);
+                  }
+              }
+              FALLTHROUGH;
+            case type_status:
+              return EXIT_FAILURE;
 
-	    case type_all_diffs:
-	      do
-		{
-		  unsigned char c0 = buf0[first_diff];
-		  unsigned char c1 = buf1[first_diff];
-		  if (c0 != c1)
-		    {
-		      char byte_buf[INT_BUFSIZE_BOUND (off_t)];
-		      char const *byte_num = offtostr (byte_number, byte_buf);
-		      if (!opt_print_bytes)
-			{
-			  /* See POSIX for this format.  */
-			  printf ("%*s %3o %3o\n",
-				  offset_width, byte_num, c0, c1);
-			}
-		      else
-			{
-			  char s0[5];
-			  char s1[5];
-			  sprintc (s0, c0);
-			  sprintc (s1, c1);
-			  printf ("%*s %3o %-4s %3o %s\n",
-				  offset_width, byte_num, c0, s0, c1, s1);
-			}
-		    }
-		  byte_number++;
-		  first_diff++;
-		}
-	      while (first_diff < smaller);
-	      differing = -1;
-	      break;
+            case type_all_diffs:
+              do
+                {
+                  unsigned char c0 = buf0[first_diff];
+                  unsigned char c1 = buf1[first_diff];
+                  if (c0 != c1)
+                    {
+                      char byte_buf[INT_BUFSIZE_BOUND (off_t)];
+                      char const *byte_num = offtostr (byte_number, byte_buf);
+                      if (!opt_print_bytes)
+                        {
+                          /* See POSIX for this format.  */
+                          printf ("%*s %3o %3o\n",
+                                  offset_width, byte_num, c0, c1);
+                        }
+                      else
+                        {
+                          char s0[5];
+                          char s1[5];
+                          sprintc (s0, c0);
+                          sprintc (s1, c1);
+                          printf ("%*s %3o %-4s %3o %s\n",
+                                  offset_width, byte_num, c0, s0, c1, s1);
+                        }
+                    }
+                  byte_number++;
+                  first_diff++;
+                }
+              while (first_diff < smaller);
+              differing = -1;
+              break;
 
-	    case type_no_stdout:
-	      differing = 1;
-	      break;
-	    }
-	}
+            case type_no_stdout:
+              differing = 1;
+              break;
+            }
+        }
 
       if (read0 != read1)
-	{
-	  if (differing <= 0 && comparison_type != type_status)
-	    {
-	      char const *shorter_file = file[read1 < read0];
+        {
+          if (differing <= 0 && comparison_type != type_status)
+            {
+              char const *shorter_file = file[read1 < read0];
 
-	      /* POSIX says that each of these format strings must be
-		 "cmp: EOF on %s", optionally followed by a blank and
-		 extra text sans newline, then terminated by "\n".  */
-	      if (byte_number == 1)
-		fprintf (stderr, _("cmp: EOF on %s which is empty\n"),
-			 shorter_file);
-	      else
-		{
-		  char byte_buf[INT_BUFSIZE_BOUND (off_t)];
-		  char const *byte_num = offtostr (byte_number - 1, byte_buf);
+              /* POSIX says that each of these format strings must be
+                 "cmp: EOF on %s", optionally followed by a blank and
+                 extra text sans newline, then terminated by "\n".  */
+              if (byte_number == 1)
+                fprintf (stderr, _("cmp: EOF on %s which is empty\n"),
+                         shorter_file);
+              else
+                {
+                  char byte_buf[INT_BUFSIZE_BOUND (off_t)];
+                  char const *byte_num = offtostr (byte_number - 1, byte_buf);
 
-		  if (comparison_type == type_first_diff)
-		    {
-		      char line_buf[INT_BUFSIZE_BOUND (off_t)];
-		      char const *line_num
-			= offtostr (line_number - at_line_start, line_buf);
-		      fprintf (stderr,
-			       (at_line_start
-				? _("cmp: EOF on %s after byte %s, line %s\n")
-				: _("cmp: EOF on %s after byte %s,"
-				    " in line %s\n")),
-			       shorter_file, byte_num, line_num);
-		    }
-		  else
-		    fprintf (stderr,
-			     _("cmp: EOF on %s after byte %s\n"),
-			     shorter_file, byte_num);
-		}
-	    }
+                  if (comparison_type == type_first_diff)
+                    {
+                      char line_buf[INT_BUFSIZE_BOUND (off_t)];
+                      char const *line_num
+                        = offtostr (line_number - at_line_start, line_buf);
+                      fprintf (stderr,
+                               (at_line_start
+                                ? _("cmp: EOF on %s after byte %s, line %s\n")
+                                : _("cmp: EOF on %s after byte %s,"
+                                    " in line %s\n")),
+                               shorter_file, byte_num, line_num);
+                    }
+                  else
+                    fprintf (stderr,
+                             _("cmp: EOF on %s after byte %s\n"),
+                             shorter_file, byte_num);
+                }
+            }
 
-	  return EXIT_FAILURE;
-	}
+          return EXIT_FAILURE;
+        }
     }
   while (differing <= 0 && read0 == buf_size);
 
@@ -656,21 +656,21 @@ sprintc (char *buf, unsigned char c)
   if (! isprint (c))
     {
       if (c >= 128)
-	{
-	  *buf++ = 'M';
-	  *buf++ = '-';
-	  c -= 128;
-	}
+        {
+          *buf++ = 'M';
+          *buf++ = '-';
+          c -= 128;
+        }
       if (c < 32)
-	{
-	  *buf++ = '^';
-	  c += 64;
-	}
+        {
+          *buf++ = '^';
+          c += 64;
+        }
       else if (c == 127)
-	{
-	  *buf++ = '^';
-	  c = '?';
-	}
+        {
+          *buf++ = '^';
+          c = '?';
+        }
     }
 
   *buf++ = c;

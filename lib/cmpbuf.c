@@ -54,28 +54,28 @@ block_read (int fd, char *buf, size_t nbytes)
       size_t bytes_to_read = MIN (bytes_remaining, readlim);
       ssize_t nread = read (fd, bp, bytes_to_read);
       if (nread <= 0)
-	{
-	  if (nread == 0)
-	    break;
+        {
+          if (nread == 0)
+            break;
 
-	  /* Accommodate Tru64 5.1, which can't read more than INT_MAX
-	     bytes at a time.  They call that a 64-bit OS?  */
-	  if (errno == EINVAL && INT_MAX < bytes_to_read)
-	    {
-	      readlim = INT_MAX;
-	      continue;
-	    }
+          /* Accommodate Tru64 5.1, which can't read more than INT_MAX
+             bytes at a time.  They call that a 64-bit OS?  */
+          if (errno == EINVAL && INT_MAX < bytes_to_read)
+            {
+              readlim = INT_MAX;
+              continue;
+            }
 
-	  /* This is needed for programs that have signal handlers on
-	     older hosts without SA_RESTART.  It also accommodates
-	     ancient AIX hosts that set errno to EINTR after uncaught
-	     SIGCONT.  See <news:1r77ojINN85n@ftp.UU.NET>
-	     (1993-04-22).  */
-	  if (! SA_RESTART && errno == EINTR)
-	    continue;
+          /* This is needed for programs that have signal handlers on
+             older hosts without SA_RESTART.  It also accommodates
+             ancient AIX hosts that set errno to EINTR after uncaught
+             SIGCONT.  See <news:1r77ojINN85n@ftp.UU.NET>
+             (1993-04-22).  */
+          if (! SA_RESTART && errno == EINTR)
+            continue;
 
-	  return SIZE_MAX;
-	}
+          return SIZE_MAX;
+        }
       bp += nread;
     }
   while (bp < buflim);

@@ -39,9 +39,9 @@ static lin find_function_last_match;
 
 static void
 print_context_label (char const *mark,
-		     struct file_data *inf,
-		     char const *name,
-		     char const *label)
+                     struct file_data *inf,
+                     char const *name,
+                     char const *label)
 {
   set_color_context (HEADER_CONTEXT);
   if (label)
@@ -49,29 +49,29 @@ print_context_label (char const *mark,
   else
     {
       char buf[MAX (INT_STRLEN_BOUND (int) + 32,
-		    INT_STRLEN_BOUND (time_t) + 11)];
+                    INT_STRLEN_BOUND (time_t) + 11)];
       struct tm const *tm = localtime (&inf->stat.st_mtime);
       int nsec = get_stat_mtime_ns (&inf->stat);
       if (! (tm && nstrftime (buf, sizeof buf, time_format, tm, 0, nsec)))
-	{
-	  verify (TYPE_IS_INTEGER (time_t));
-	  if (LONG_MIN <= TYPE_MINIMUM (time_t)
-	      && TYPE_MAXIMUM (time_t) <= LONG_MAX)
-	    {
-	      long int sec = inf->stat.st_mtime;
-	      sprintf (buf, "%ld.%.9d", sec, nsec);
-	    }
-	  else if (TYPE_MAXIMUM (time_t) <= INTMAX_MAX)
-	    {
-	      intmax_t sec = inf->stat.st_mtime;
-	      sprintf (buf, "%"PRIdMAX".%.9d", sec, nsec);
-	    }
-	  else
-	    {
-	      uintmax_t sec = inf->stat.st_mtime;
-	      sprintf (buf, "%"PRIuMAX".%.9d", sec, nsec);
-	    }
-	}
+        {
+          verify (TYPE_IS_INTEGER (time_t));
+          if (LONG_MIN <= TYPE_MINIMUM (time_t)
+              && TYPE_MAXIMUM (time_t) <= LONG_MAX)
+            {
+              long int sec = inf->stat.st_mtime;
+              sprintf (buf, "%ld.%.9d", sec, nsec);
+            }
+          else if (TYPE_MAXIMUM (time_t) <= INTMAX_MAX)
+            {
+              intmax_t sec = inf->stat.st_mtime;
+              sprintf (buf, "%"PRIdMAX".%.9d", sec, nsec);
+            }
+          else
+            {
+              uintmax_t sec = inf->stat.st_mtime;
+              sprintf (buf, "%"PRIuMAX".%.9d", sec, nsec);
+            }
+        }
       fprintf (outfile, "%s %s\t%s", mark, name, buf);
     }
   set_color_context (RESET_CONTEXT);
@@ -106,7 +106,7 @@ print_context_script (struct change *script, bool unidiff)
     {
       struct change *e;
       for (e = script; e; e = e->link)
-	e->ignore = false;
+        e->ignore = false;
     }
 
   find_function_last_search = - files[0].prefix_lines;
@@ -221,30 +221,30 @@ pr_context_hunk (struct change *hunk)
       struct change *next = hunk;
 
       for (i = first0; i <= last0; i++)
-	{
-	  set_color_context (DELETE_CONTEXT);
+        {
+          set_color_context (DELETE_CONTEXT);
 
-	  /* Skip past changes that apply (in file 0)
-	     only to lines before line I.  */
+          /* Skip past changes that apply (in file 0)
+             only to lines before line I.  */
 
-	  while (next && next->line0 + next->deleted <= i)
-	    next = next->link;
+          while (next && next->line0 + next->deleted <= i)
+            next = next->link;
 
-	  /* Compute the marking for line I.  */
+          /* Compute the marking for line I.  */
 
-	  prefix = " ";
-	  if (next && next->line0 <= i)
+          prefix = " ";
+          if (next && next->line0 <= i)
             {
               /* The change NEXT covers this line.
                  If lines were inserted here in file 1, this is "changed".
                  Otherwise it is "deleted".  */
               prefix = (next->inserted > 0 ? "!" : "-");
             }
-	  print_1_line_nl (prefix, &files[0].linbuf[i], true);
+          print_1_line_nl (prefix, &files[0].linbuf[i], true);
           set_color_context (RESET_CONTEXT);
           if (files[0].linbuf[i + 1][-1] == '\n')
             putc ('\n', out);
-	}
+        }
     }
 
   set_color_context (LINE_NUMBER_CONTEXT);
@@ -259,30 +259,30 @@ pr_context_hunk (struct change *hunk)
       struct change *next = hunk;
 
       for (i = first1; i <= last1; i++)
-	{
-	  set_color_context (ADD_CONTEXT);
+        {
+          set_color_context (ADD_CONTEXT);
 
-	  /* Skip past changes that apply (in file 1)
-	     only to lines before line I.  */
+          /* Skip past changes that apply (in file 1)
+             only to lines before line I.  */
 
-	  while (next && next->line1 + next->inserted <= i)
-	    next = next->link;
+          while (next && next->line1 + next->inserted <= i)
+            next = next->link;
 
-	  /* Compute the marking for line I.  */
+          /* Compute the marking for line I.  */
 
-	  prefix = " ";
-	  if (next && next->line1 <= i)
+          prefix = " ";
+          if (next && next->line1 <= i)
             {
               /* The change NEXT covers this line.
                  If lines were deleted here in file 0, this is "changed".
                  Otherwise it is "inserted".  */
               prefix = (next->deleted > 0 ? "!" : "+");
             }
-	  print_1_line_nl (prefix, &files[1].linbuf[i], true);
+          print_1_line_nl (prefix, &files[1].linbuf[i], true);
           set_color_context (RESET_CONTEXT);
           if (files[1].linbuf[i + 1][-1] == '\n')
             putc ('\n', out);
-	}
+        }
     }
 }
 
@@ -375,57 +375,57 @@ pr_unidiff_hunk (struct change *hunk)
       /* If the line isn't a difference, output the context from file 0. */
 
       if (!next || i < next->line0)
-	{
-	  char const *const *line = &files[0].linbuf[i++];
-	  if (! (suppress_blank_empty && **line == '\n'))
-	    putc (initial_tab ? '\t' : ' ', out);
-	  print_1_line (NULL, line);
-	  j++;
-	}
+        {
+          char const *const *line = &files[0].linbuf[i++];
+          if (! (suppress_blank_empty && **line == '\n'))
+            putc (initial_tab ? '\t' : ' ', out);
+          print_1_line (NULL, line);
+          j++;
+        }
       else
-	{
-	  /* For each difference, first output the deleted part. */
+        {
+          /* For each difference, first output the deleted part. */
 
-	  k = next->deleted;
-
-	  while (k--)
-	    {
-	      char const * const *line = &files[0].linbuf[i++];
-	      set_color_context (DELETE_CONTEXT);
-	      putc ('-', out);
-	      if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
-		putc ('\t', out);
-	      print_1_line_nl (NULL, line, true);
-
-	      set_color_context (RESET_CONTEXT);
-
-              if (line[1][-1] == '\n')
-                putc ('\n', out);
-	    }
-
-	  /* Then output the inserted part. */
-
-	  k = next->inserted;
+          k = next->deleted;
 
           while (k--)
-	    {
-	      char const * const *line = &files[1].linbuf[j++];
-	      set_color_context (ADD_CONTEXT);
-	      putc ('+', out);
-	      if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
-		putc ('\t', out);
-	      print_1_line_nl (NULL, line, true);
+            {
+              char const * const *line = &files[0].linbuf[i++];
+              set_color_context (DELETE_CONTEXT);
+              putc ('-', out);
+              if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
+                putc ('\t', out);
+              print_1_line_nl (NULL, line, true);
 
               set_color_context (RESET_CONTEXT);
 
               if (line[1][-1] == '\n')
                 putc ('\n', out);
-	    }
+            }
 
-	  /* We're done with this hunk, so on to the next! */
+          /* Then output the inserted part. */
 
-	  next = next->link;
-	}
+          k = next->inserted;
+
+          while (k--)
+            {
+              char const * const *line = &files[1].linbuf[j++];
+              set_color_context (ADD_CONTEXT);
+              putc ('+', out);
+              if (initial_tab && ! (suppress_blank_empty && **line == '\n'))
+                putc ('\t', out);
+              print_1_line_nl (NULL, line, true);
+
+              set_color_context (RESET_CONTEXT);
+
+              if (line[1][-1] == '\n')
+                putc ('\n', out);
+            }
+
+          /* We're done with this hunk, so on to the next! */
+
+          next = next->link;
+        }
     }
 }
 
@@ -454,16 +454,16 @@ find_hunk (struct change *start)
       prev = start;
       start = start->link;
       thresh = (start && start->ignore
-		? ignorable_threshold
-		: non_ignorable_threshold);
+                ? ignorable_threshold
+                : non_ignorable_threshold);
       /* It is not supposed to matter which file we check in the end-test.
-	 If it would matter, crash.  */
+         If it would matter, crash.  */
       if (start && start->line0 - top0 != start->line1 - top1)
-	abort ();
+        abort ();
     } while (start
-	     /* Keep going if less than THRESH lines
-		elapse before the affected line.  */
-	     && start->line0 - top0 < thresh);
+             /* Keep going if less than THRESH lines
+                elapse before the affected line.  */
+             && start->line0 - top0 < thresh);
 
   return prev;
 }
@@ -485,7 +485,7 @@ mark_ignorable (struct change *script)
 
       /* Determine whether this change is ignorable.  */
       script->ignore = ! analyze_hunk (script,
-				       &first0, &last0, &first1, &last1);
+                                       &first0, &last0, &first1, &last1);
 
       /* Reconnect the chain as before.  */
       script->link = next;
@@ -516,10 +516,10 @@ find_function (char const * const *linbuf, lin linenum)
       int len = MIN (linelen, INT_MAX);
 
       if (0 <= re_search (&function_regexp, line, len, 0, len, NULL))
-	{
-	  find_function_last_match = i;
-	  return line;
-	}
+        {
+          find_function_last_match = i;
+          return line;
+        }
     }
   /* If we search back to where we started searching the previous time,
      find the line we found last time.  */

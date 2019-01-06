@@ -101,7 +101,7 @@ message (char const *format_msgid, char const *arg1, char const *arg2)
 
 void
 message5 (char const *format_msgid, char const *arg1, char const *arg2,
-	  char const *arg3, char const *arg4)
+          char const *arg3, char const *arg4)
 {
   if (paginate)
     {
@@ -119,12 +119,12 @@ message5 (char const *format_msgid, char const *arg1, char const *arg2,
       arg[4] = arg4 ? arg4 : "";
 
       for (i = 0;  i < 5;  i++)
-	total_size += size[i] = strlen (arg[i]) + 1;
+        total_size += size[i] = strlen (arg[i]) + 1;
 
       new = xmalloc (total_size);
 
       for (i = 0, p = new->args;  i < 5;  p += size[i++])
-	memcpy (p, arg[i], size[i]);
+        memcpy (p, arg[i], size[i]);
 
       *msg_chain_end = new;
       new->next = 0;
@@ -133,7 +133,7 @@ message5 (char const *format_msgid, char const *arg1, char const *arg2,
   else
     {
       if (sdiff_merge_assist)
-	putchar (' ');
+        putchar (' ');
       printf (_(format_msgid), arg1, arg2, arg3, arg4);
     }
 }
@@ -152,7 +152,7 @@ print_message_queue (void)
       struct msg *next = m->next;
       arg[0] = m->args;
       for (i = 0;  i < 4;  i++)
-	arg[i + 1] = arg[i] + strlen (arg[i]) + 1;
+        arg[i + 1] = arg[i] + strlen (arg[i]) + 1;
       printf (_(arg[0]), arg[1], arg[2], arg[3], arg[4]);
       free (m);
       m = next;
@@ -770,21 +770,21 @@ c_escape (char const *str)
       char c = *s;
 
       if (c == ' ')
-	{
-	  must_quote = true;
-	  continue;
-	}
+        {
+          must_quote = true;
+          continue;
+        }
       switch (c_escape_char (*s))
-	{
-	  case 1:
-	    plus += 3;
-	    /* fall through */
-	  case 0:
-	    break;
-	  default:
-	    plus++;
-	    break;
-	}
+        {
+          case 1:
+            plus += 3;
+            /* fall through */
+          case 0:
+            break;
+          default:
+            plus++;
+            break;
+        }
     }
 
   if (must_quote || plus)
@@ -795,27 +795,27 @@ c_escape (char const *str)
 
       *b++ = '"';
       for (s = str; *s; s++)
-	{
-	  char c = *s;
-	  char escape = c_escape_char (c);
+        {
+          char c = *s;
+          char escape = c_escape_char (c);
 
-	  switch (escape)
-	    {
-	      case 0:
-		*b++ = c;
-		break;
-	      case 1:
-		*b++ = '\\';
-		*b++ = ((c >> 6) & 03) + '0';
-		*b++ = ((c >> 3) & 07) + '0';
-		*b++ = ((c >> 0) & 07) + '0';
-		break;
-	      default:
-		*b++ = '\\';
-		*b++ = escape;
-		break;
-	    }
-	}
+          switch (escape)
+            {
+              case 0:
+                *b++ = c;
+                break;
+              case 1:
+                *b++ = '\\';
+                *b++ = ((c >> 6) & 03) + '0';
+                *b++ = ((c >> 3) & 07) + '0';
+                *b++ = ((c >> 0) & 07) + '0';
+                break;
+              default:
+                *b++ = '\\';
+                *b++ = escape;
+                break;
+            }
+        }
       *b++ = '"';
       *b = 0;
       return buffer;
@@ -849,7 +849,7 @@ begin_output (void)
       char const *argv[4];
 
       if (fflush (stdout) != 0)
-	pfatal_with_name (_("write failed"));
+        pfatal_with_name (_("write failed"));
 
       argv[0] = pr_program;
       argv[1] = "-h";
@@ -859,44 +859,44 @@ begin_output (void)
       /* Make OUTFILE a pipe to a subsidiary 'pr'.  */
       {
 #if HAVE_WORKING_FORK
-	int pipes[2];
+        int pipes[2];
 
-	if (pipe (pipes) != 0)
-	  pfatal_with_name ("pipe");
+        if (pipe (pipes) != 0)
+          pfatal_with_name ("pipe");
 
-	pr_pid = fork ();
-	if (pr_pid < 0)
-	  pfatal_with_name ("fork");
+        pr_pid = fork ();
+        if (pr_pid < 0)
+          pfatal_with_name ("fork");
 
-	if (pr_pid == 0)
-	  {
-	    close (pipes[1]);
-	    if (pipes[0] != STDIN_FILENO)
-	      {
-		if (dup2 (pipes[0], STDIN_FILENO) < 0)
-		  pfatal_with_name ("dup2");
-		close (pipes[0]);
-	      }
+        if (pr_pid == 0)
+          {
+            close (pipes[1]);
+            if (pipes[0] != STDIN_FILENO)
+              {
+                if (dup2 (pipes[0], STDIN_FILENO) < 0)
+                  pfatal_with_name ("dup2");
+                close (pipes[0]);
+              }
 
-	    execv (pr_program, (char **) argv);
-	    _exit (errno == ENOENT ? 127 : 126);
-	  }
-	else
-	  {
-	    close (pipes[0]);
-	    outfile = fdopen (pipes[1], "w");
-	    if (!outfile)
-	      pfatal_with_name ("fdopen");
-	    check_color_output (true);
-	  }
+            execv (pr_program, (char **) argv);
+            _exit (errno == ENOENT ? 127 : 126);
+          }
+        else
+          {
+            close (pipes[0]);
+            outfile = fdopen (pipes[1], "w");
+            if (!outfile)
+              pfatal_with_name ("fdopen");
+            check_color_output (true);
+          }
 #else
-	char *command = system_quote_argv (SCI_SYSTEM, (char **) argv);
-	errno = 0;
-	outfile = popen (command, "w");
-	if (!outfile)
-	  pfatal_with_name (command);
-	check_color_output (true);
-	free (command);
+        char *command = system_quote_argv (SCI_SYSTEM, (char **) argv);
+        errno = 0;
+        outfile = popen (command, "w");
+        if (!outfile)
+          pfatal_with_name (command);
+        check_color_output (true);
+        free (command);
 #endif
       }
     }
@@ -909,9 +909,9 @@ begin_output (void)
       check_color_output (false);
 
       /* If handling multiple files (because scanning a directory),
-	 print which files the following output is about.  */
+         print which files the following output is about.  */
       if (currently_recursive)
-	printf ("%s\n", name);
+        printf ("%s\n", name);
     }
 
   free (name);
@@ -949,30 +949,30 @@ finish_output (void)
       int wstatus;
       int werrno = 0;
       if (ferror (outfile))
-	fatal ("write failed");
+        fatal ("write failed");
 #if ! HAVE_WORKING_FORK
       wstatus = pclose (outfile);
       if (wstatus == -1)
-	werrno = errno;
+        werrno = errno;
 #else
       if (fclose (outfile) != 0)
-	pfatal_with_name (_("write failed"));
+        pfatal_with_name (_("write failed"));
       if (waitpid (pr_pid, &wstatus, 0) < 0)
-	pfatal_with_name ("waitpid");
+        pfatal_with_name ("waitpid");
 #endif
       status = (! werrno && WIFEXITED (wstatus)
-		? WEXITSTATUS (wstatus)
-		: INT_MAX);
+                ? WEXITSTATUS (wstatus)
+                : INT_MAX);
       if (status)
-	die (EXIT_TROUBLE, werrno,
-	       _(status == 126
-		 ? "subsidiary program '%s' could not be invoked"
-		 : status == 127
-		 ? "subsidiary program '%s' not found"
-		 : status == INT_MAX
-		 ? "subsidiary program '%s' failed"
-		 : "subsidiary program '%s' failed (exit status %d)"),
-	       pr_program, status);
+        die (EXIT_TROUBLE, werrno,
+               _(status == 126
+                 ? "subsidiary program '%s' could not be invoked"
+                 : status == 127
+                 ? "subsidiary program '%s' not found"
+                 : status == INT_MAX
+                 ? "subsidiary program '%s' failed"
+                 : "subsidiary program '%s' failed (exit status %d)"),
+               pr_program, status);
     }
 
   outfile = 0;
@@ -998,143 +998,143 @@ lines_differ (char const *s1, char const *s2)
 
       /* Test for exact char equality first, since it's a common case.  */
       if (c1 != c2)
-	{
-	  switch (ignore_white_space)
-	    {
-	    case IGNORE_ALL_SPACE:
-	      /* For -w, just skip past any white space.  */
-	      while (isspace (c1) && c1 != '\n') c1 = *t1++;
-	      while (isspace (c2) && c2 != '\n') c2 = *t2++;
-	      break;
+        {
+          switch (ignore_white_space)
+            {
+            case IGNORE_ALL_SPACE:
+              /* For -w, just skip past any white space.  */
+              while (isspace (c1) && c1 != '\n') c1 = *t1++;
+              while (isspace (c2) && c2 != '\n') c2 = *t2++;
+              break;
 
-	    case IGNORE_SPACE_CHANGE:
-	      /* For -b, advance past any sequence of white space in
-		 line 1 and consider it just one space, or nothing at
-		 all if it is at the end of the line.  */
-	      if (isspace (c1))
-		{
-		  while (c1 != '\n')
-		    {
-		      c1 = *t1++;
-		      if (! isspace (c1))
-			{
-			  --t1;
-			  c1 = ' ';
-			  break;
-			}
-		    }
-		}
+            case IGNORE_SPACE_CHANGE:
+              /* For -b, advance past any sequence of white space in
+                 line 1 and consider it just one space, or nothing at
+                 all if it is at the end of the line.  */
+              if (isspace (c1))
+                {
+                  while (c1 != '\n')
+                    {
+                      c1 = *t1++;
+                      if (! isspace (c1))
+                        {
+                          --t1;
+                          c1 = ' ';
+                          break;
+                        }
+                    }
+                }
 
-	      /* Likewise for line 2.  */
-	      if (isspace (c2))
-		{
-		  while (c2 != '\n')
-		    {
-		      c2 = *t2++;
-		      if (! isspace (c2))
-			{
-			  --t2;
-			  c2 = ' ';
-			  break;
-			}
-		    }
-		}
+              /* Likewise for line 2.  */
+              if (isspace (c2))
+                {
+                  while (c2 != '\n')
+                    {
+                      c2 = *t2++;
+                      if (! isspace (c2))
+                        {
+                          --t2;
+                          c2 = ' ';
+                          break;
+                        }
+                    }
+                }
 
-	      if (c1 != c2)
-		{
-		  /* If we went too far when doing the simple test
-		     for equality, go back to the first non-white-space
-		     character in both sides and try again.  */
-		  if (c2 == ' ' && c1 != '\n'
-		      && s1 + 1 < t1
-		      && isspace ((unsigned char) t1[-2]))
-		    {
-		      --t1;
-		      continue;
-		    }
-		  if (c1 == ' ' && c2 != '\n'
-		      && s2 + 1 < t2
-		      && isspace ((unsigned char) t2[-2]))
-		    {
-		      --t2;
-		      continue;
-		    }
-		}
+              if (c1 != c2)
+                {
+                  /* If we went too far when doing the simple test
+                     for equality, go back to the first non-white-space
+                     character in both sides and try again.  */
+                  if (c2 == ' ' && c1 != '\n'
+                      && s1 + 1 < t1
+                      && isspace ((unsigned char) t1[-2]))
+                    {
+                      --t1;
+                      continue;
+                    }
+                  if (c1 == ' ' && c2 != '\n'
+                      && s2 + 1 < t2
+                      && isspace ((unsigned char) t2[-2]))
+                    {
+                      --t2;
+                      continue;
+                    }
+                }
 
-	      break;
+              break;
 
-	    case IGNORE_TRAILING_SPACE:
-	    case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
-	      if (isspace (c1) && isspace (c2))
-		{
-		  unsigned char c;
-		  if (c1 != '\n')
-		    {
-		      char const *p = t1;
-		      while ((c = *p) != '\n' && isspace (c))
-			++p;
-		      if (c != '\n')
-			break;
-		    }
-		  if (c2 != '\n')
-		    {
-		      char const *p = t2;
-		      while ((c = *p) != '\n' && isspace (c))
-			++p;
-		      if (c != '\n')
-			break;
-		    }
-		  /* Both lines have nothing but whitespace left.  */
-		  return false;
-		}
-	      if (ignore_white_space == IGNORE_TRAILING_SPACE)
-		break;
-	      FALLTHROUGH;
-	    case IGNORE_TAB_EXPANSION:
-	      if ((c1 == ' ' && c2 == '\t')
-		  || (c1 == '\t' && c2 == ' '))
-		{
-		  size_t column2 = column;
-		  for (;; c1 = *t1++)
-		    {
-		      if (c1 == ' ')
-			column++;
-		      else if (c1 == '\t')
-			column += tabsize - column % tabsize;
-		      else
-			break;
-		    }
-		  for (;; c2 = *t2++)
-		    {
-		      if (c2 == ' ')
-			column2++;
-		      else if (c2 == '\t')
-			column2 += tabsize - column2 % tabsize;
-		      else
-			break;
-		    }
-		  if (column != column2)
-		    return true;
-		}
-	      break;
+            case IGNORE_TRAILING_SPACE:
+            case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
+              if (isspace (c1) && isspace (c2))
+                {
+                  unsigned char c;
+                  if (c1 != '\n')
+                    {
+                      char const *p = t1;
+                      while ((c = *p) != '\n' && isspace (c))
+                        ++p;
+                      if (c != '\n')
+                        break;
+                    }
+                  if (c2 != '\n')
+                    {
+                      char const *p = t2;
+                      while ((c = *p) != '\n' && isspace (c))
+                        ++p;
+                      if (c != '\n')
+                        break;
+                    }
+                  /* Both lines have nothing but whitespace left.  */
+                  return false;
+                }
+              if (ignore_white_space == IGNORE_TRAILING_SPACE)
+                break;
+              FALLTHROUGH;
+            case IGNORE_TAB_EXPANSION:
+              if ((c1 == ' ' && c2 == '\t')
+                  || (c1 == '\t' && c2 == ' '))
+                {
+                  size_t column2 = column;
+                  for (;; c1 = *t1++)
+                    {
+                      if (c1 == ' ')
+                        column++;
+                      else if (c1 == '\t')
+                        column += tabsize - column % tabsize;
+                      else
+                        break;
+                    }
+                  for (;; c2 = *t2++)
+                    {
+                      if (c2 == ' ')
+                        column2++;
+                      else if (c2 == '\t')
+                        column2 += tabsize - column2 % tabsize;
+                      else
+                        break;
+                    }
+                  if (column != column2)
+                    return true;
+                }
+              break;
 
-	    case IGNORE_NO_WHITE_SPACE:
-	      break;
-	    }
+            case IGNORE_NO_WHITE_SPACE:
+              break;
+            }
 
-	  /* Lowercase all letters if -i is specified.  */
+          /* Lowercase all letters if -i is specified.  */
 
-	  if (ignore_case)
-	    {
-	      c1 = tolower (c1);
-	      c2 = tolower (c2);
-	    }
+          if (ignore_case)
+            {
+              c1 = tolower (c1);
+              c2 = tolower (c2);
+            }
 
-	  if (c1 != c2)
-	    break;
-	}
+          if (c1 != c2)
+            break;
+        }
       if (c1 == '\n')
-	return false;
+        return false;
 
       column += c1 == '\t' ? tabsize - column % tabsize : 1;
     }
@@ -1170,8 +1170,8 @@ find_reverse_change (struct change *start)
 
 void
 print_script (struct change *script,
-	      struct change * (*hunkfun) (struct change *),
-	      void (*printfun) (struct change *))
+              struct change * (*hunkfun) (struct change *),
+              void (*printfun) (struct change *))
 {
   struct change *next = script;
 
@@ -1184,7 +1184,7 @@ print_script (struct change *script,
       end = (*hunkfun) (next);
 
       /* Disconnect them from the rest of the changes,
-	 making them a hunk, and remember the rest for next iteration.  */
+         making them a hunk, and remember the rest for next iteration.  */
       next = end->link;
       end->link = 0;
 #ifdef DEBUG
@@ -1234,14 +1234,14 @@ print_1_line_nl (char const *line_flag, char const *const *line, bool skip_nl)
       char const *line_flag_1 = line_flag;
 
       if (suppress_blank_empty && **line == '\n')
-	{
-	  flag_format_1 = "%s";
+        {
+          flag_format_1 = "%s";
 
-	  /* This hack to omit trailing blanks takes advantage of the
-	     fact that the only way that LINE_FLAG can end in a blank
-	     is when LINE_FLAG consists of a single blank.  */
-	  line_flag_1 += *line_flag_1 == ' ';
-	}
+          /* This hack to omit trailing blanks takes advantage of the
+             fact that the only way that LINE_FLAG can end in a blank
+             is when LINE_FLAG consists of a single blank.  */
+          line_flag_1 += *line_flag_1 == ' ';
+        }
 
       fprintf (out, flag_format_1, line_flag_1);
     }
@@ -1262,7 +1262,7 @@ print_1_line_nl (char const *line_flag, char const *const *line, bool skip_nl)
 
 void
 output_1_line (char const *base, char const *limit, char const *flag_format,
-	       char const *line_flag)
+               char const *line_flag)
 {
   const size_t MAX_CHUNK = 1024;
   if (!expand_tabs)
@@ -1405,8 +1405,8 @@ translate_line_number (struct file_data const *file, lin i)
 
 void
 translate_range (struct file_data const *file,
-		 lin a, lin b,
-		 printint *aptr, printint *bptr)
+                 lin a, lin b,
+                 printint *aptr, printint *bptr)
 {
   *aptr = translate_line_number (file, a - 1) + 1;
   *bptr = translate_line_number (file, b + 1) - 1;
@@ -1448,8 +1448,8 @@ print_number_range (char sepchar, struct file_data *file, lin a, lin b)
 
 enum changes
 analyze_hunk (struct change *hunk,
-	      lin *first0, lin *last0,
-	      lin *first1, lin *last1)
+              lin *first0, lin *last0,
+              lin *first1, lin *last1)
 {
   struct change *next;
   lin l0, l1;
@@ -1482,46 +1482,46 @@ analyze_hunk (struct change *hunk,
       show_to += next->inserted;
 
       for (i = next->line0; i <= l0 && trivial; i++)
-	{
-	  char const *line = linbuf0[i];
-	  char const *lastbyte = linbuf0[i + 1] - 1;
-	  char const *newline = lastbyte + (*lastbyte != '\n');
-	  size_t len = newline - line;
-	  char const *p = line;
-	  if (skip_white_space)
-	    for (; *p != '\n'; p++)
-	      if (! isspace ((unsigned char) *p))
-		{
-		  if (! skip_leading_white_space)
-		    p = line;
-		  break;
-		}
-	  if (newline - p != trivial_length
-	      && (! ignore_regexp.fastmap
-		  || re_search (&ignore_regexp, line, len, 0, len, 0) < 0))
-	    trivial = 0;
-	}
+        {
+          char const *line = linbuf0[i];
+          char const *lastbyte = linbuf0[i + 1] - 1;
+          char const *newline = lastbyte + (*lastbyte != '\n');
+          size_t len = newline - line;
+          char const *p = line;
+          if (skip_white_space)
+            for (; *p != '\n'; p++)
+              if (! isspace ((unsigned char) *p))
+                {
+                  if (! skip_leading_white_space)
+                    p = line;
+                  break;
+                }
+          if (newline - p != trivial_length
+              && (! ignore_regexp.fastmap
+                  || re_search (&ignore_regexp, line, len, 0, len, 0) < 0))
+            trivial = 0;
+        }
 
       for (i = next->line1; i <= l1 && trivial; i++)
-	{
-	  char const *line = linbuf1[i];
-	  char const *lastbyte = linbuf1[i + 1] - 1;
-	  char const *newline = lastbyte + (*lastbyte != '\n');
-	  size_t len = newline - line;
-	  char const *p = line;
-	  if (skip_white_space)
-	    for (; *p != '\n'; p++)
-	      if (! isspace ((unsigned char) *p))
-		{
-		  if (! skip_leading_white_space)
-		    p = line;
-		  break;
-		}
-	  if (newline - p != trivial_length
-	      && (! ignore_regexp.fastmap
-		  || re_search (&ignore_regexp, line, len, 0, len, 0) < 0))
-	    trivial = 0;
-	}
+        {
+          char const *line = linbuf1[i];
+          char const *lastbyte = linbuf1[i + 1] - 1;
+          char const *newline = lastbyte + (*lastbyte != '\n');
+          size_t len = newline - line;
+          char const *p = line;
+          if (skip_white_space)
+            for (; *p != '\n'; p++)
+              if (! isspace ((unsigned char) *p))
+                {
+                  if (! skip_leading_white_space)
+                    p = line;
+                  break;
+                }
+          if (newline - p != trivial_length
+              && (! ignore_regexp.fastmap
+                  || re_search (&ignore_regexp, line, len, 0, len, 0) < 0))
+            trivial = 0;
+        }
     }
   while ((next = next->link) != 0);
 
@@ -1569,7 +1569,7 @@ debug_script (struct change *sp)
       printint deleted = sp->deleted;
       printint inserted = sp->inserted;
       fprintf (stderr, "%3"pI"d %3"pI"d delete %"pI"d insert %"pI"d\n",
-	       line0, line1, deleted, inserted);
+               line0, line1, deleted, inserted);
     }
 
   fflush (stderr);

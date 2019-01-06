@@ -31,10 +31,10 @@ struct group
 };
 
 static char const *format_group (FILE *, char const *, char,
-				 struct group const *);
+                                 struct group const *);
 static char const *do_printf_spec (FILE *, char const *,
-				   struct file_data const *, lin,
-				   struct group const *);
+                                   struct file_data const *, lin,
+                                   struct group const *);
 static char const *scan_char_literal (char const *, char *);
 static lin groups_letter_value (struct group const *, char);
 static void format_ifdef (char const *, lin, lin, lin, lin);
@@ -56,8 +56,8 @@ print_ifdef_script (struct change *script)
     {
       begin_output ();
       format_ifdef (group_format[UNCHANGED],
-		    next_line0, files[0].valid_lines,
-		    next_line1, files[1].valid_lines);
+                    next_line0, files[0].valid_lines,
+                    next_line1, files[1].valid_lines);
     }
 }
 
@@ -80,15 +80,15 @@ print_ifdef_hunk (struct change *hunk)
   /* Print lines up to this change.  */
   if (next_line0 < first0 || next_line1 < first1)
     format_ifdef (group_format[UNCHANGED],
-		  next_line0, first0,
-		  next_line1, first1);
+                  next_line0, first0,
+                  next_line1, first1);
 
   /* Print this change.  */
   next_line0 = last0 + 1;
   next_line1 = last1 + 1;
   format_ifdef (group_format[changes],
-		first0, next_line0,
-		first1, next_line1);
+                first0, next_line0,
+                first1, next_line1);
 }
 
 /* Print a set of lines according to FORMAT.
@@ -117,7 +117,7 @@ format_ifdef (char const *format, lin beg0, lin end0, lin beg1, lin end1)
 
 static char const *
 format_group (register FILE *out, char const *format, char endchar,
-	      struct group const *groups)
+              struct group const *groups)
 {
   register char c;
   register char const *f = format;
@@ -126,81 +126,81 @@ format_group (register FILE *out, char const *format, char endchar,
     {
       char const *f1 = ++f;
       if (c == '%')
-	switch ((c = *f++))
-	  {
-	  case '%':
-	    break;
+        switch ((c = *f++))
+          {
+          case '%':
+            break;
 
-	  case '(':
-	    /* Print if-then-else format e.g. '%(n=1?thenpart:elsepart)'.  */
-	    {
-	      int i;
-	      uintmax_t value[2];
-	      FILE *thenout, *elseout;
+          case '(':
+            /* Print if-then-else format e.g. '%(n=1?thenpart:elsepart)'.  */
+            {
+              int i;
+              uintmax_t value[2];
+              FILE *thenout, *elseout;
 
-	      for (i = 0; i < 2; i++)
-		{
-		  if (ISDIGIT (*f))
-		    {
-		      char *fend;
-		      errno = 0;
-		      value[i] = strtoumax (f, &fend, 10);
-		      if (errno)
-			goto bad_format;
-		      f = fend;
-		    }
-		  else
-		    {
-		      value[i] = groups_letter_value (groups, *f);
-		      if (value[i] == -1)
-			goto bad_format;
-		      f++;
-		    }
-		  if (*f++ != "=?"[i])
-		    goto bad_format;
-		}
-	      if (value[0] == value[1])
-		thenout = out, elseout = 0;
-	      else
-		thenout = 0, elseout = out;
-	      f = format_group (thenout, f, ':', groups);
-	      if (*f)
-		{
-		  f = format_group (elseout, f + 1, ')', groups);
-		  if (*f)
-		    f++;
-		}
-	    }
-	    continue;
+              for (i = 0; i < 2; i++)
+                {
+                  if (ISDIGIT (*f))
+                    {
+                      char *fend;
+                      errno = 0;
+                      value[i] = strtoumax (f, &fend, 10);
+                      if (errno)
+                        goto bad_format;
+                      f = fend;
+                    }
+                  else
+                    {
+                      value[i] = groups_letter_value (groups, *f);
+                      if (value[i] == -1)
+                        goto bad_format;
+                      f++;
+                    }
+                  if (*f++ != "=?"[i])
+                    goto bad_format;
+                }
+              if (value[0] == value[1])
+                thenout = out, elseout = 0;
+              else
+                thenout = 0, elseout = out;
+              f = format_group (thenout, f, ':', groups);
+              if (*f)
+                {
+                  f = format_group (elseout, f + 1, ')', groups);
+                  if (*f)
+                    f++;
+                }
+            }
+            continue;
 
-	  case '<':
-	    /* Print lines deleted from first file.  */
-	    print_ifdef_lines (out, line_format[OLD], &groups[0]);
-	    continue;
+          case '<':
+            /* Print lines deleted from first file.  */
+            print_ifdef_lines (out, line_format[OLD], &groups[0]);
+            continue;
 
-	  case '=':
-	    /* Print common lines.  */
-	    print_ifdef_lines (out, line_format[UNCHANGED], &groups[0]);
-	    continue;
+          case '=':
+            /* Print common lines.  */
+            print_ifdef_lines (out, line_format[UNCHANGED], &groups[0]);
+            continue;
 
-	  case '>':
-	    /* Print lines inserted from second file.  */
-	    print_ifdef_lines (out, line_format[NEW], &groups[1]);
-	    continue;
+          case '>':
+            /* Print lines inserted from second file.  */
+            print_ifdef_lines (out, line_format[NEW], &groups[1]);
+            continue;
 
-	  default:
-	    f = do_printf_spec (out, f - 2, 0, 0, groups);
-	    if (f)
-	      continue;
-	    /* Fall through. */
-	  bad_format:
-	    c = '%';
-	    f = f1;
-	    break;
-	  }
+          default:
+            f = do_printf_spec (out, f - 2, 0, 0, groups);
+            if (f)
+              continue;
+            /* Fall through. */
+          bad_format:
+            c = '%';
+            f = f1;
+            break;
+          }
 
       if (out)
-	putc (c, out);
+        putc (c, out);
     }
 
   return f;
@@ -235,7 +235,7 @@ groups_letter_value (struct group const *g, char letter)
    But do nothing if OUT is zero.  */
 static void
 print_ifdef_lines (register FILE *out, char const *format,
-		   struct group const *group)
+                   struct group const *group)
 {
   struct file_data const *file = group->file;
   char const * const *linbuf = file->linbuf;
@@ -248,18 +248,18 @@ print_ifdef_lines (register FILE *out, char const *format,
   if (!expand_tabs && format[0] == '%')
     {
       if (format[1] == 'l' && format[2] == '\n' && !format[3] && from < upto)
-	{
-	  fwrite (linbuf[from], sizeof (char),
-		  linbuf[upto] + (linbuf[upto][-1] != '\n') -  linbuf[from],
-		  out);
-	  return;
-	}
+        {
+          fwrite (linbuf[from], sizeof (char),
+                  linbuf[upto] + (linbuf[upto][-1] != '\n') -  linbuf[from],
+                  out);
+          return;
+        }
       if (format[1] == 'L' && !format[2])
-	{
-	  fwrite (linbuf[from], sizeof (char),
-		  linbuf[upto] -  linbuf[from], out);
-	  return;
-	}
+        {
+          fwrite (linbuf[from], sizeof (char),
+                  linbuf[upto] -  linbuf[from], out);
+          return;
+        }
     }
 
   for (;  from < upto;  from++)
@@ -268,43 +268,43 @@ print_ifdef_lines (register FILE *out, char const *format,
       register char const *f = format;
 
       while ((c = *f++) != 0)
-	{
-	  char const *f1 = f;
-	  if (c == '%')
-	    switch ((c = *f++))
-	      {
-	      case '%':
-		break;
+        {
+          char const *f1 = f;
+          if (c == '%')
+            switch ((c = *f++))
+              {
+              case '%':
+                break;
 
-	      case 'l':
-		output_1_line (linbuf[from],
-			       (linbuf[from + 1]
-				- (linbuf[from + 1][-1] == '\n')),
-			       0, 0);
-		continue;
+              case 'l':
+                output_1_line (linbuf[from],
+                               (linbuf[from + 1]
+                                - (linbuf[from + 1][-1] == '\n')),
+                               0, 0);
+                continue;
 
-	      case 'L':
-		output_1_line (linbuf[from], linbuf[from + 1], 0, 0);
-		continue;
+              case 'L':
+                output_1_line (linbuf[from], linbuf[from + 1], 0, 0);
+                continue;
 
-	      default:
-		f = do_printf_spec (out, f - 2, file, from, 0);
-		if (f)
-		  continue;
-		c = '%';
-		f = f1;
-		break;
-	      }
+              default:
+                f = do_printf_spec (out, f - 2, file, from, 0);
+                if (f)
+                  continue;
+                c = '%';
+                f = f1;
+                break;
+              }
 
-	  putc (c, out);
-	}
+          putc (c, out);
+        }
     }
 }
 
 static char const *
 do_printf_spec (FILE *out, char const *spec,
-		struct file_data const *file, lin n,
-		struct group const *groups)
+                struct file_data const *file, lin n,
+                struct group const *groups)
 {
   char const *f = spec;
   char c;
@@ -326,57 +326,57 @@ do_printf_spec (FILE *out, char const *spec,
     {
     case 'c':
       if (c1 != '\'')
-	return 0;
+        return 0;
       else
-	{
-	  char value IF_LINT (= 0);
-	  f = scan_char_literal (f, &value);
-	  if (!f)
-	    return 0;
-	  if (out)
-	    putc (value, out);
-	}
+        {
+          char value IF_LINT (= 0);
+          f = scan_char_literal (f, &value);
+          if (!f)
+            return 0;
+          if (out)
+            putc (value, out);
+        }
       break;
 
     case 'd': case 'o': case 'x': case 'X':
       {
-	lin value;
+        lin value;
 
-	if (file)
-	  {
-	    if (c1 != 'n')
-	      return 0;
-	    value = translate_line_number (file, n);
-	  }
-	else
-	  {
-	    value = groups_letter_value (groups, c1);
-	    if (value < 0)
-	      return 0;
-	  }
+        if (file)
+          {
+            if (c1 != 'n')
+              return 0;
+            value = translate_line_number (file, n);
+          }
+        else
+          {
+            value = groups_letter_value (groups, c1);
+            if (value < 0)
+              return 0;
+          }
 
-	if (out)
-	  {
-	    /* For example, if the spec is "%3xn" and pI is "l", use the printf
-	       format spec "%3lx".  Here the spec prefix is "%3".  */
-	    printint print_value = value;
-	    size_t spec_prefix_len = f - spec - 2;
-	    size_t pI_len = sizeof pI - 1;
+        if (out)
+          {
+            /* For example, if the spec is "%3xn" and pI is "l", use the printf
+               format spec "%3lx".  Here the spec prefix is "%3".  */
+            printint print_value = value;
+            size_t spec_prefix_len = f - spec - 2;
+            size_t pI_len = sizeof pI - 1;
 #if 0
-	    char format[spec_prefix_len + pI_len + 2];
+            char format[spec_prefix_len + pI_len + 2];
 #else
-	    char *format = xmalloc (spec_prefix_len + pI_len + 2);
+            char *format = xmalloc (spec_prefix_len + pI_len + 2);
 #endif
-	    char *p = format + spec_prefix_len + pI_len;
-	    memcpy (format, spec, spec_prefix_len);
-	    memcpy (format + spec_prefix_len, pI, pI_len);
-	    *p++ = c;
-	    *p = '\0';
-	    fprintf (out, format, print_value);
+            char *p = format + spec_prefix_len + pI_len;
+            memcpy (format, spec, spec_prefix_len);
+            memcpy (format + spec_prefix_len, pI, pI_len);
+            *p++ = c;
+            *p = '\0';
+            fprintf (out, format, print_value);
 #if ! HAVE_C_VARARRAYS
-	    free (format);
+            free (format);
 #endif
-	  }
+          }
       }
       break;
 
@@ -403,27 +403,27 @@ scan_char_literal (char const *lit, char *valptr)
     {
       case 0:
       case '\'':
-	return NULL;
+        return NULL;
 
       case '\\':
-	value = 0;
-	while ((c = *p++) != '\'')
-	  {
-	    unsigned int digit = c - '0';
-	    if (8 <= digit)
-	      return NULL;
-	    value = 8 * value + digit;
-	  }
-	digits = p - lit - 2;
-	if (! (1 <= digits && digits <= 3))
-	  return NULL;
-	break;
+        value = 0;
+        while ((c = *p++) != '\'')
+          {
+            unsigned int digit = c - '0';
+            if (8 <= digit)
+              return NULL;
+            value = 8 * value + digit;
+          }
+        digits = p - lit - 2;
+        if (! (1 <= digits && digits <= 3))
+          return NULL;
+        break;
 
       default:
-	value = c;
-	if (*p++ != '\'')
-	  return NULL;
-	break;
+        value = c;
+        if (*p++ != '\'')
+          return NULL;
+        break;
     }
 
   *valptr = value;

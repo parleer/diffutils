@@ -72,9 +72,9 @@ file_block_read (struct file_data *current, size_t size)
   if (size && ! current->eof)
     {
       size_t s = block_read (current->desc,
-			     FILE_BUFFER (current) + current->buffered, size);
+                             FILE_BUFFER (current) + current->buffered, size);
       if (s == SIZE_MAX)
-	pfatal_with_name (current->name);
+        pfatal_with_name (current->name);
       current->buffered += s;
       current->eof = s < size;
     }
@@ -104,40 +104,40 @@ sip (struct file_data *current, bool skip_test)
   else
     {
       current->bufsize = buffer_lcm (sizeof (word),
-				     STAT_BLOCKSIZE (current->stat),
-				     PTRDIFF_MAX - 2 * sizeof (word));
+                                     STAT_BLOCKSIZE (current->stat),
+                                     PTRDIFF_MAX - 2 * sizeof (word));
       current->buffer = xmalloc (current->bufsize);
 
 #ifdef __KLIBC__
       /* Skip test if seek is not possible */
       skip_test = skip_test
-		  || (lseek (current->desc, 0, SEEK_CUR) < 0
-		      && errno == ESPIPE);
+                  || (lseek (current->desc, 0, SEEK_CUR) < 0
+                      && errno == ESPIPE);
 #endif
 
       if (! skip_test)
-	{
-	  /* Check first part of file to see if it's a binary file.  */
+        {
+          /* Check first part of file to see if it's a binary file.  */
 
-	  int prev_mode = set_binary_mode (current->desc, O_BINARY);
-	  off_t buffered;
-	  file_block_read (current, current->bufsize);
-	  buffered = current->buffered;
+          int prev_mode = set_binary_mode (current->desc, O_BINARY);
+          off_t buffered;
+          file_block_read (current, current->bufsize);
+          buffered = current->buffered;
 
-	  if (prev_mode != O_BINARY)
-	    {
-	      /* Revert to text mode and seek back to the start to reread
-		 the file.  Use relative seek, since file descriptors
-		 like stdin might not start at offset zero.  */
-	      if (lseek (current->desc, - buffered, SEEK_CUR) < 0)
-		pfatal_with_name (current->name);
-	      set_binary_mode (current->desc, prev_mode);
-	      current->buffered = 0;
-	      current->eof = false;
-	    }
+          if (prev_mode != O_BINARY)
+            {
+              /* Revert to text mode and seek back to the start to reread
+                 the file.  Use relative seek, since file descriptors
+                 like stdin might not start at offset zero.  */
+              if (lseek (current->desc, - buffered, SEEK_CUR) < 0)
+                pfatal_with_name (current->name);
+              set_binary_mode (current->desc, prev_mode);
+              current->buffered = 0;
+              current->eof = false;
+            }
 
-	  return binary_file_p (current->buffer, buffered);
-	}
+          return binary_file_p (current->buffer, buffered);
+        }
     }
 
   current->buffered = 0;
@@ -163,30 +163,30 @@ slurp (struct file_data *current)
       /* It's a regular file; slurp in the rest all at once.  */
 
       /* Get the size out of the stat block.
-	 Allocate just enough room for appended newline plus word sentinel,
-	 plus word-alignment since we want the buffer word-aligned.  */
+         Allocate just enough room for appended newline plus word sentinel,
+         plus word-alignment since we want the buffer word-aligned.  */
       size_t file_size = current->stat.st_size;
       cc = file_size + 2 * sizeof (word) - file_size % sizeof (word);
       if (file_size != current->stat.st_size || cc < file_size
-	  || PTRDIFF_MAX <= cc)
-	xalloc_die ();
+          || PTRDIFF_MAX <= cc)
+        xalloc_die ();
 
       if (current->bufsize < cc)
-	{
-	  current->bufsize = cc;
-	  current->buffer = xrealloc (current->buffer, cc);
-	}
+        {
+          current->bufsize = cc;
+          current->buffer = xrealloc (current->buffer, cc);
+        }
 
       /* Try to read at least 1 more byte than the size indicates, to
-	 detect whether the file is growing.  This is a nicety for
-	 users who run 'diff' on files while they are changing.  */
+         detect whether the file is growing.  This is a nicety for
+         users who run 'diff' on files while they are changing.  */
 
       if (current->buffered <= file_size)
-	{
-	  file_block_read (current, file_size + 1 - current->buffered);
-	  if (current->buffered <= file_size)
-	    return;
-	}
+        {
+          file_block_read (current, file_size + 1 - current->buffered);
+          if (current->buffered <= file_size)
+            return;
+        }
     }
 
   /* It's not a regular file, or it's a growing regular file; read it,
@@ -197,16 +197,16 @@ slurp (struct file_data *current)
   if (current->buffered)
     {
       while (current->buffered == current->bufsize)
-	{
-	  if (PTRDIFF_MAX / 2 - sizeof (word) < current->bufsize)
-	    xalloc_die ();
-	  current->bufsize *= 2;
-	  current->buffer = xrealloc (current->buffer, current->bufsize);
-	  file_block_read (current, current->bufsize - current->buffered);
-	}
+        {
+          if (PTRDIFF_MAX / 2 - sizeof (word) < current->bufsize)
+            xalloc_die ();
+          current->bufsize *= 2;
+          current->buffer = xrealloc (current->buffer, current->bufsize);
+          file_block_read (current, current->bufsize - current->buffered);
+        }
 
       /* Allocate just enough room for appended newline plus word
-	 sentinel, plus word-alignment.  */
+         sentinel, plus word-alignment.  */
       cc = current->buffered + 2 * sizeof (word);
       current->bufsize = cc - cc % sizeof (word);
       current->buffer = xrealloc (current->buffer, current->bufsize);
@@ -249,97 +249,97 @@ find_and_hash_each_line (struct file_data *current)
 
       /* Hash this line until we find a newline.  */
       switch (ig_white_space)
-	{
-	case IGNORE_ALL_SPACE:
-	  while ((c = *p++) != '\n')
-	    if (! isspace (c))
-	      h = HASH (h, ig_case ? tolower (c) : c);
-	  break;
+        {
+        case IGNORE_ALL_SPACE:
+          while ((c = *p++) != '\n')
+            if (! isspace (c))
+              h = HASH (h, ig_case ? tolower (c) : c);
+          break;
 
-	case IGNORE_SPACE_CHANGE:
-	  while ((c = *p++) != '\n')
-	    {
-	      if (isspace (c))
-		{
-		  do
-		    if ((c = *p++) == '\n')
-		      goto hashing_done;
-		  while (isspace (c));
+        case IGNORE_SPACE_CHANGE:
+          while ((c = *p++) != '\n')
+            {
+              if (isspace (c))
+                {
+                  do
+                    if ((c = *p++) == '\n')
+                      goto hashing_done;
+                  while (isspace (c));
 
-		  h = HASH (h, ' ');
-		}
+                  h = HASH (h, ' ');
+                }
 
-	      /* C is now the first non-space.  */
-	      h = HASH (h, ig_case ? tolower (c) : c);
-	    }
-	  break;
+              /* C is now the first non-space.  */
+              h = HASH (h, ig_case ? tolower (c) : c);
+            }
+          break;
 
-	case IGNORE_TAB_EXPANSION:
-	case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
-	case IGNORE_TRAILING_SPACE:
-	  {
-	    size_t column = 0;
-	    while ((c = *p++) != '\n')
-	      {
-		if (ig_white_space & IGNORE_TRAILING_SPACE
-		    && isspace (c))
-		  {
-		    char const *p1 = p;
-		    unsigned char c1;
-		    do
-		      if ((c1 = *p1++) == '\n')
-			{
-			  p = p1;
-			  goto hashing_done;
-			}
-		    while (isspace (c1));
-		  }
+        case IGNORE_TAB_EXPANSION:
+        case IGNORE_TAB_EXPANSION_AND_TRAILING_SPACE:
+        case IGNORE_TRAILING_SPACE:
+          {
+            size_t column = 0;
+            while ((c = *p++) != '\n')
+              {
+                if (ig_white_space & IGNORE_TRAILING_SPACE
+                    && isspace (c))
+                  {
+                    char const *p1 = p;
+                    unsigned char c1;
+                    do
+                      if ((c1 = *p1++) == '\n')
+                        {
+                          p = p1;
+                          goto hashing_done;
+                        }
+                    while (isspace (c1));
+                  }
 
-		size_t repetitions = 1;
+                size_t repetitions = 1;
 
-		if (ig_white_space & IGNORE_TAB_EXPANSION)
-		  switch (c)
-		    {
-		    case '\b':
-		      column -= 0 < column;
-		      break;
+                if (ig_white_space & IGNORE_TAB_EXPANSION)
+                  switch (c)
+                    {
+                    case '\b':
+                      column -= 0 < column;
+                      break;
 
-		    case '\t':
-		      c = ' ';
-		      repetitions = tabsize - column % tabsize;
-		      column = (column + repetitions < column
-				? 0
-				: column + repetitions);
-		      break;
+                    case '\t':
+                      c = ' ';
+                      repetitions = tabsize - column % tabsize;
+                      column = (column + repetitions < column
+                                ? 0
+                                : column + repetitions);
+                      break;
 
-		    case '\r':
-		      column = 0;
-		      break;
+                    case '\r':
+                      column = 0;
+                      break;
 
-		    default:
-		      column++;
-		      break;
-		    }
+                    default:
+                      column++;
+                      break;
+                    }
 
-		if (ig_case)
-		  c = tolower (c);
+                if (ig_case)
+                  c = tolower (c);
 
-		do
-		  h = HASH (h, c);
-		while (--repetitions != 0);
-	      }
-	  }
-	  break;
+                do
+                  h = HASH (h, c);
+                while (--repetitions != 0);
+              }
+          }
+          break;
 
-	default:
-	  if (ig_case)
-	    while ((c = *p++) != '\n')
-	      h = HASH (h, tolower (c));
-	  else
-	    while ((c = *p++) != '\n')
-	      h = HASH (h, c);
-	  break;
-	}
+        default:
+          if (ig_case)
+            while ((c = *p++) != '\n')
+              h = HASH (h, tolower (c));
+          else
+            while ((c = *p++) != '\n')
+              h = HASH (h, c);
+          break;
+        }
 
    hashing_done:;
 
@@ -347,75 +347,75 @@ find_and_hash_each_line (struct file_data *current)
       length = p - ip - 1;
 
       if (p == bufend
-	  && current->missing_newline
-	  && ROBUST_OUTPUT_STYLE (output_style))
-	{
-	  /* The last line is incomplete and we do not silently
-	     complete lines.  If the line cannot compare equal to any
-	     complete line, put it into buckets[-1] so that it can
-	     compare equal only to the other file's incomplete line
-	     (if one exists).  */
-	  if (ig_white_space < IGNORE_TRAILING_SPACE)
-	    bucket = &buckets[-1];
-	}
+          && current->missing_newline
+          && ROBUST_OUTPUT_STYLE (output_style))
+        {
+          /* The last line is incomplete and we do not silently
+             complete lines.  If the line cannot compare equal to any
+             complete line, put it into buckets[-1] so that it can
+             compare equal only to the other file's incomplete line
+             (if one exists).  */
+          if (ig_white_space < IGNORE_TRAILING_SPACE)
+            bucket = &buckets[-1];
+        }
 
       for (i = *bucket;  ;  i = eqs[i].next)
-	if (!i)
-	  {
-	    /* Create a new equivalence class in this bucket.  */
-	    i = eqs_index++;
-	    if (i == eqs_alloc)
-	      {
-		if (PTRDIFF_MAX / (2 * sizeof *eqs) <= eqs_alloc)
-		  xalloc_die ();
-		eqs_alloc *= 2;
-		eqs = xrealloc (eqs, eqs_alloc * sizeof *eqs);
-	      }
-	    eqs[i].next = *bucket;
-	    eqs[i].hash = h;
-	    eqs[i].line = ip;
-	    eqs[i].length = length;
-	    *bucket = i;
-	    break;
-	  }
-	else if (eqs[i].hash == h)
-	  {
-	    char const *eqline = eqs[i].line;
+        if (!i)
+          {
+            /* Create a new equivalence class in this bucket.  */
+            i = eqs_index++;
+            if (i == eqs_alloc)
+              {
+                if (PTRDIFF_MAX / (2 * sizeof *eqs) <= eqs_alloc)
+                  xalloc_die ();
+                eqs_alloc *= 2;
+                eqs = xrealloc (eqs, eqs_alloc * sizeof *eqs);
+              }
+            eqs[i].next = *bucket;
+            eqs[i].hash = h;
+            eqs[i].line = ip;
+            eqs[i].length = length;
+            *bucket = i;
+            break;
+          }
+        else if (eqs[i].hash == h)
+          {
+            char const *eqline = eqs[i].line;
 
-	    /* Reuse existing class if lines_differ reports the lines
+            /* Reuse existing class if lines_differ reports the lines
                equal.  */
-	    if (eqs[i].length == length)
-	      {
-		/* Reuse existing equivalence class if the lines are identical.
-		   This detects the common case of exact identity
-		   faster than lines_differ would.  */
-		if (memcmp (eqline, ip, length) == 0)
-		  break;
-		if (!same_length_diff_contents_compare_anyway)
-		  continue;
-	      }
-	    else if (!diff_length_compare_anyway)
-	      continue;
+            if (eqs[i].length == length)
+              {
+                /* Reuse existing equivalence class if the lines are identical.
+                   This detects the common case of exact identity
+                   faster than lines_differ would.  */
+                if (memcmp (eqline, ip, length) == 0)
+                  break;
+                if (!same_length_diff_contents_compare_anyway)
+                  continue;
+              }
+            else if (!diff_length_compare_anyway)
+              continue;
 
-	    if (! lines_differ (eqline, ip))
-	      break;
-	  }
+            if (! lines_differ (eqline, ip))
+              break;
+          }
 
       /* Maybe increase the size of the line table.  */
       if (line == alloc_lines)
-	{
-	  /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
-	  if (PTRDIFF_MAX / 3 <= alloc_lines
-	      || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
-	      || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
-	    xalloc_die ();
-	  alloc_lines = 2 * alloc_lines - linbuf_base;
-	  cureqs = xrealloc (cureqs, alloc_lines * sizeof *cureqs);
-	  linbuf += linbuf_base;
-	  linbuf = xrealloc (linbuf,
-			     (alloc_lines - linbuf_base) * sizeof *linbuf);
-	  linbuf -= linbuf_base;
-	}
+        {
+          /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
+          if (PTRDIFF_MAX / 3 <= alloc_lines
+              || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
+              || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
+            xalloc_die ();
+          alloc_lines = 2 * alloc_lines - linbuf_base;
+          cureqs = xrealloc (cureqs, alloc_lines * sizeof *cureqs);
+          linbuf += linbuf_base;
+          linbuf = xrealloc (linbuf,
+                             (alloc_lines - linbuf_base) * sizeof *linbuf);
+          linbuf -= linbuf_base;
+        }
       linbuf[line] = ip;
       cureqs[line] = i;
       ++line;
@@ -426,39 +426,39 @@ find_and_hash_each_line (struct file_data *current)
   for (i = 0;  ;  i++)
     {
       /* Record the line start for lines in the suffix that we care about.
-	 Record one more line start than lines,
-	 so that we can compute the length of any buffered line.  */
+         Record one more line start than lines,
+         so that we can compute the length of any buffered line.  */
       if (line == alloc_lines)
-	{
-	  /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
-	  if (PTRDIFF_MAX / 3 <= alloc_lines
-	      || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
-	      || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
-	    xalloc_die ();
-	  alloc_lines = 2 * alloc_lines - linbuf_base;
-	  linbuf += linbuf_base;
-	  linbuf = xrealloc (linbuf,
-			     (alloc_lines - linbuf_base) * sizeof *linbuf);
-	  linbuf -= linbuf_base;
-	}
+        {
+          /* Double (alloc_lines - linbuf_base) by adding to alloc_lines.  */
+          if (PTRDIFF_MAX / 3 <= alloc_lines
+              || PTRDIFF_MAX / sizeof *cureqs <= 2 * alloc_lines - linbuf_base
+              || PTRDIFF_MAX / sizeof *linbuf <= alloc_lines - linbuf_base)
+            xalloc_die ();
+          alloc_lines = 2 * alloc_lines - linbuf_base;
+          linbuf += linbuf_base;
+          linbuf = xrealloc (linbuf,
+                             (alloc_lines - linbuf_base) * sizeof *linbuf);
+          linbuf -= linbuf_base;
+        }
       linbuf[line] = p;
 
       if (p == bufend)
-	{
-	  /* If the last line is incomplete and we do not silently
-	     complete lines, don't count its appended newline.  */
-	  if (current->missing_newline && ROBUST_OUTPUT_STYLE (output_style))
-	    linbuf[line]--;
-	  break;
-	}
+        {
+          /* If the last line is incomplete and we do not silently
+             complete lines, don't count its appended newline.  */
+          if (current->missing_newline && ROBUST_OUTPUT_STYLE (output_style))
+            linbuf[line]--;
+          break;
+        }
 
       if (context <= i && no_diff_means_no_output)
-	break;
+        break;
 
       line++;
 
       while (*p++ != '\n')
-	continue;
+        continue;
     }
 
   /* Done with cache in local variables.  */
@@ -491,10 +491,10 @@ prepare_text (struct file_data *current)
       char *dst = rawmemchr (p, '\r');
 
       for (char const *src = dst; src != srclim; src++)
-	{
-	  src += *src == '\r' && src[1] == '\n';
-	  *dst++ = *src;
-	}
+        {
+          src += *src == '\r' && src[1] == '\n';
+          *dst++ = *src;
+        }
 
       buffered -= srclim - dst;
     }
@@ -570,31 +570,31 @@ find_identical_ends (struct file_data filevec[])
   else
     {
       /* Insert end sentinels, in this case characters that are guaranteed
-	 to make the equality test false, and thus terminate the loop.  */
+         to make the equality test false, and thus terminate the loop.  */
 
       if (n0 < n1)
-	p0[n0] = ~p1[n0];
+        p0[n0] = ~p1[n0];
       else
-	p1[n1] = ~p0[n1];
+        p1[n1] = ~p0[n1];
 
       /* Loop until first mismatch, or to the sentinel characters.  */
 
       /* Compare a word at a time for speed.  */
       while (*w0 == *w1)
-	w0++, w1++;
+        w0++, w1++;
 
       /* Do the last few bytes of comparison a byte at a time.  */
       p0 = (char *) w0;
       p1 = (char *) w1;
       while (*p0 == *p1)
-	p0++, p1++;
+        p0++, p1++;
 
       /* Don't mistakenly count missing newline as part of prefix.  */
       if (ROBUST_OUTPUT_STYLE (output_style)
-	  && ((buffer0 + n0 - filevec[0].missing_newline < p0)
-	      !=
-	      (buffer1 + n1 - filevec[1].missing_newline < p1)))
-	p0--, p1--;
+          && ((buffer0 + n0 - filevec[0].missing_newline < p0)
+              !=
+              (buffer1 + n1 - filevec[1].missing_newline < p1)))
+        p0--, p1--;
     }
 
   /* Now P0 and P1 point at the first nonmatching characters.  */
@@ -621,30 +621,30 @@ find_identical_ends (struct file_data filevec[])
       end0 = p0;	/* Addr of last char in file 0.  */
 
       /* Get value of P0 at which we should stop scanning backward:
-	 this is when either P0 or P1 points just past the last char
-	 of the identical prefix.  */
+         this is when either P0 or P1 points just past the last char
+         of the identical prefix.  */
       beg0 = filevec[0].prefix_end + (n0 < n1 ? 0 : n0 - n1);
 
       /* Scan back until chars don't match or we reach that point.  */
       while (p0 != beg0)
-	if (*--p0 != *--p1)
-	  {
-	    /* Point at the first char of the matching suffix.  */
-	    ++p0, ++p1;
-	    beg0 = p0;
-	    break;
-	  }
+        if (*--p0 != *--p1)
+          {
+            /* Point at the first char of the matching suffix.  */
+            ++p0, ++p1;
+            beg0 = p0;
+            break;
+          }
 
       /* Are we at a line-beginning in both files?  If not, add the rest of
-	 this line to the main body.  Discard up to HORIZON_LINES lines from
-	 the identical suffix.  Also, discard one extra line,
-	 because shift_boundaries may need it.  */
+         this line to the main body.  Discard up to HORIZON_LINES lines from
+         the identical suffix.  Also, discard one extra line,
+         because shift_boundaries may need it.  */
       i = horizon_lines + !((buffer0 == p0 || p0[-1] == '\n')
-			    &&
-			    (buffer1 == p1 || p1[-1] == '\n'));
+                            &&
+                            (buffer1 == p1 || p1[-1] == '\n'));
       while (i-- && p0 != end0)
-	while (*p0++ != '\n')
-	  continue;
+        while (*p0++ != '\n')
+          continue;
 
       p1 += p0 - beg0;
     }
@@ -673,9 +673,9 @@ find_identical_ends (struct file_data filevec[])
       middle_guess = guess_lines (0, 0, p0 - filevec[0].prefix_end);
       suffix_guess = guess_lines (0, 0, buffer0 + n0 - p0);
       for (prefix_count = 1;  prefix_count <= context;  prefix_count *= 2)
-	continue;
+        continue;
       alloc_lines0 = (prefix_count + middle_guess
-		      + MIN (context, suffix_guess));
+                      + MIN (context, suffix_guess));
     }
   else
     {
@@ -687,8 +687,8 @@ find_identical_ends (struct file_data filevec[])
   lines = 0;
   linbuf0 = xmalloc (alloc_lines0 * sizeof *linbuf0);
   prefix_needed = ! (no_diff_means_no_output
-		     && filevec[0].prefix_end == p0
-		     && filevec[1].prefix_end == p1);
+                     && filevec[0].prefix_end == p0
+                     && filevec[1].prefix_end == p1);
   p0 = buffer0;
 
   /* If the prefix is needed, find the prefix lines.  */
@@ -696,19 +696,19 @@ find_identical_ends (struct file_data filevec[])
     {
       end0 = filevec[0].prefix_end;
       while (p0 != end0)
-	{
-	  lin l = lines++ & prefix_mask;
-	  if (l == alloc_lines0)
-	    {
-	      if (PTRDIFF_MAX / (2 * sizeof *linbuf0) <= alloc_lines0)
-		xalloc_die ();
-	      alloc_lines0 *= 2;
-	      linbuf0 = xrealloc (linbuf0, alloc_lines0 * sizeof *linbuf0);
-	    }
-	  linbuf0[l] = p0;
-	  while (*p0++ != '\n')
-	    continue;
-	}
+        {
+          lin l = lines++ & prefix_mask;
+          if (l == alloc_lines0)
+            {
+              if (PTRDIFF_MAX / (2 * sizeof *linbuf0) <= alloc_lines0)
+                xalloc_die ();
+              alloc_lines0 *= 2;
+              linbuf0 = xrealloc (linbuf0, alloc_lines0 * sizeof *linbuf0);
+            }
+          linbuf0[l] = p0;
+          while (*p0++ != '\n')
+            continue;
+        }
     }
   buffered_prefix = prefix_count && context < lines ? context : lines;
 
@@ -726,9 +726,9 @@ find_identical_ends (struct file_data filevec[])
     {
       /* Rotate prefix lines to proper location.  */
       for (i = 0;  i < buffered_prefix;  i++)
-	linbuf1[i] = linbuf0[(lines - context + i) & prefix_mask];
+        linbuf1[i] = linbuf0[(lines - context + i) & prefix_mask];
       for (i = 0;  i < buffered_prefix;  i++)
-	linbuf0[i] = linbuf1[i];
+        linbuf0[i] = linbuf1[i];
     }
 
   /* Initialize line buffer 1 from line buffer 0.  */

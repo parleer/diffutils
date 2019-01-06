@@ -97,7 +97,7 @@ generate_emsgids='
       line = substr(line, percent_index + 2)
       bracket_index = index(line, "}")
       if (bracket_index == 0) {
-	continue
+        continue
       }
       msgid = substr(line, 1, bracket_index - 1)
       if (index(msgid, "%") != 0) {
