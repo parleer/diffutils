@@ -11,6 +11,14 @@ GNU diffutils NEWS                                    -*- outline -*-
   transition, or HP-UX even if not setuid.
   [bug#33965 introduced in 2.8]
 
+** Bug fixes
+
+  diff and related programs no longer get confused if stdin, stdout,
+  or stderr are closed.  Previously, they sometimes opened files into
+  file descriptors 0, 1, or 2 and then mistakenly did I/O with them
+  that was intended for stdin, stdout, or stderr.
+  [bug#33965 present since "the beginning"]
+
 
 * Noteworthy changes in release 3.7 (2018-12-31) [stable]
 

@@ -300,7 +300,7 @@ main (int argc, char **argv)
   presume_output_tty = false;
   int stdopen_errno = stdopen ();
   if (stdopen_errno != 0)
-    error (EXIT_TROUBLE, stdopen_errno, "standard file descriptors");
+    error (EXIT_TROUBLE, stdopen_errno, _("standard file descriptors"));
 
   /* Decode the options.  */
 

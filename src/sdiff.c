@@ -32,6 +32,7 @@
 #include <file-type.h>
 #include <getopt.h>
 #include <progname.h>
+#include <stdopen.h>
 #include <system-quote.h>
 #include <version-etc.h>
 #include <xalloc.h>
@@ -455,6 +456,9 @@ main (int argc, char *argv[])
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
   c_stack_action (cleanup);
+  int stdopen_errno = stdopen ();
+  if (stdopen_errno != 0)
+    error (EXIT_TROUBLE, stdopen_errno, _("standard file descriptors"));
 
   prog = getenv ("EDITOR");
   if (prog)

@@ -31,6 +31,7 @@
 #include <hard-locale.h>
 #include <inttostr.h>
 #include <progname.h>
+#include <stdopen.h>
 #include <unlocked-io.h>
 #include <version-etc.h>
 #include <xalloc.h>
@@ -199,7 +200,7 @@ GB 1,000,000,000, G 1,073,741,824, and so on for T, P, E, Z, Y."),
 int
 main (int argc, char **argv)
 {
-  int c, f, exit_status;
+  int c, exit_status;
   size_t words_per_buffer;
 
   exit_failure = EXIT_TROUBLE;
@@ -209,6 +210,9 @@ main (int argc, char **argv)
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
   c_stack_action (0);
+  int stdopen_errno = stdopen ();
+  if (stdopen_errno != 0)
+    error (EXIT_TROUBLE, stdopen_errno, _("standard file descriptors"));
 
   /* Parse command line options.  */
 
@@ -268,7 +272,7 @@ main (int argc, char **argv)
   file[0] = argv[optind++];
   file[1] = optind < argc ? argv[optind++] : "-";
 
-  for (f = 0; f < 2 && optind < argc; f++)
+  for (int f = 0; f < 2 && optind < argc; f++)
     {
       char *arg = argv[optind++];
       specify_ignore_initial (f, &arg, 0);
@@ -277,33 +281,29 @@ main (int argc, char **argv)
   if (optind < argc)
     try_help ("extra operand '%s'", argv[optind]);
 
-  for (f = 0; f < 2; f++)
+  for (int f = 0; f < 2; f++)
     {
-      /* If file[1] is "-", treat it first; this avoids a misdiagnostic if
-	 stdin is closed and opening file[0] yields file descriptor 0.  */
-      int f1 = f ^ (STREQ (file[1], "-"));
-
       /* Two files with the same name and offset are identical.
 	 But wait until we open the file once, for proper diagnostics.  */
       if (f && ignore_initial[0] == ignore_initial[1]
 	  && file_name_cmp (file[0], file[1]) == 0)
 	return EXIT_SUCCESS;
 
-      if (STREQ (file[f1], "-"))
+      if (STREQ (file[f], "-"))
 	{
-	  file_desc[f1] = STDIN_FILENO;
+	  file_desc[f] = STDIN_FILENO;
 	  if (O_BINARY && ! isatty (STDIN_FILENO))
 	    set_binary_mode (STDIN_FILENO, O_BINARY);
 	}
       else
-	file_desc[f1] = open (file[f1], O_RDONLY | O_BINARY, 0);
+	file_desc[f] = open (file[f], O_RDONLY | O_BINARY, 0);
 
-      if (file_desc[f1] < 0 || fstat (file_desc[f1], stat_buf + f1) != 0)
+      if (file_desc[f] < 0 || fstat (file_desc[f], stat_buf + f) != 0)
 	{
-	  if (file_desc[f1] < 0 && comparison_type == type_status)
+	  if (file_desc[f] < 0 && comparison_type == type_status)
 	    exit (EXIT_TROUBLE);
 	  else
-	    die (EXIT_TROUBLE, errno, "%s", file[f1]);
+	    die (EXIT_TROUBLE, errno, "%s", file[f]);
 	}
     }
 
@@ -361,7 +361,7 @@ main (int argc, char **argv)
 
   exit_status = cmp ();
 
-  for (f = 0; f < 2; f++)
+  for (int f = 0; f < 2; f++)
     if (close (file_desc[f]) != 0)
       die (EXIT_TROUBLE, errno, "%s", file[f]);
   if (exit_status != EXIT_SUCCESS && comparison_type < type_no_stdout)
