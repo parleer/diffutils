@@ -37,11 +37,11 @@
 #include <progname.h>
 #include <sh-quote.h>
 #include <stat-time.h>
-#include <stdopen.h>
 #include <timespec.h>
 #include <version-etc.h>
 #include <xalloc.h>
 #include <xreadlink.h>
+#include <xstdopen.h>
 #include <binary-io.h>
 
 /* The official name of this program (e.g., no 'g' prefix).  */
@@ -298,9 +298,7 @@ main (int argc, char **argv)
   re_set_syntax (RE_SYNTAX_GREP | RE_NO_POSIX_BACKTRACKING);
   excluded = new_exclude ();
   presume_output_tty = false;
-  int stdopen_errno = stdopen ();
-  if (stdopen_errno != 0)
-    error (EXIT_TROUBLE, stdopen_errno, _("standard file descriptors"));
+  xstdopen ();
 
   /* Decode the options.  */
 

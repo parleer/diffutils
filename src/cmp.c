@@ -31,11 +31,11 @@
 #include <hard-locale.h>
 #include <inttostr.h>
 #include <progname.h>
-#include <stdopen.h>
 #include <unlocked-io.h>
 #include <version-etc.h>
 #include <xalloc.h>
 #include <binary-io.h>
+#include <xstdopen.h>
 #include <xstrtol.h>
 
 /* The official name of this program (e.g., no 'g' prefix).  */
@@ -210,9 +210,7 @@ main (int argc, char **argv)
   bindtextdomain (PACKAGE, LOCALEDIR);
   textdomain (PACKAGE);
   c_stack_action (0);
-  int stdopen_errno = stdopen ();
-  if (stdopen_errno != 0)
-    error (EXIT_TROUBLE, stdopen_errno, _("standard file descriptors"));
+  xstdopen ();
 
   /* Parse command line options.  */
 
