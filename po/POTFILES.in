@@ -24,6 +24,7 @@ lib/quotearg.c
 lib/regcomp.c
 lib/xalloc-die.c
 lib/xfreopen.c
+lib/xstdopen.c
 lib/xstrtol-error.c
 lib/version-etc.c
 
