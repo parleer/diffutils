@@ -11,10 +11,12 @@
 /README-release
 /aclocal.m4
 /build-aux
+/confdefs*
 /config.cache
 /config.log
 /config.status
 /configure
+/conftest*
 /diffutils-*.tar.xz
 /doc/.gitignore
 /doc/diffutils.aux
