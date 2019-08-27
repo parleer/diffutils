@@ -135,7 +135,7 @@ format_group (register FILE *out, char const *format, char endchar,
             /* Print if-then-else format e.g. '%(n=1?thenpart:elsepart)'.  */
             {
               int i;
-              uintmax_t value[2];
+              intmax_t value[2];
               FILE *thenout, *elseout;
 
               for (i = 0; i < 2; i++)
@@ -144,7 +144,7 @@ format_group (register FILE *out, char const *format, char endchar,
                     {
                       char *fend;
                       errno = 0;
-                      value[i] = strtoumax (f, &fend, 10);
+                      value[i] = strtoimax (f, &fend, 10);
                       if (errno)
                         goto bad_format;
                       f = fend;
@@ -152,7 +152,7 @@ format_group (register FILE *out, char const *format, char endchar,
                   else
                     {
                       value[i] = groups_letter_value (groups, *f);
-                      if (value[i] == -1)
+                      if (value[i] < 0)
                         goto bad_format;
                       f++;
                     }

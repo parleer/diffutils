@@ -19,6 +19,10 @@ GNU diffutils NEWS                                    -*- outline -*-
   that was intended for stdin, stdout, or stderr.
   [bug#33965 present since "the beginning"]
 
+  cmp, diff and sdiff no longer treat negative command-line
+  option-arguments as if they were large positive numbers.
+  [bug#35256 introduced in 2.8]
+
 
 * Noteworthy changes in release 3.7 (2018-12-31) [stable]
 

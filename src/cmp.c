@@ -75,8 +75,8 @@ static size_t buf_size;
 /* Initial prefix to ignore for each file.  */
 static off_t ignore_initial[2];
 
-/* Number of bytes to compare.  */
-static uintmax_t bytes = UINTMAX_MAX;
+/* Number of bytes to compare, or -1 if there is no limit.  */
+static intmax_t bytes = -1;
 
 /* Output format.  */
 static enum comparison_type
@@ -129,12 +129,12 @@ static char const valid_suffixes[] = "kKMGTPEZY0";
 static void
 specify_ignore_initial (int f, char **argptr, char delimiter)
 {
-  uintmax_t val;
+  intmax_t val;
   char const *arg = *argptr;
-  strtol_error e = xstrtoumax (arg, argptr, 0, &val, valid_suffixes);
-  if (! (e == LONGINT_OK
-         || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
-      || TYPE_MAXIMUM (off_t) < val)
+  strtol_error e = xstrtoimax (arg, argptr, 0, &val, valid_suffixes);
+  if (! ((e == LONGINT_OK
+          || (e == LONGINT_INVALID_SUFFIX_CHAR && **argptr == delimiter))
+         && 0 <= val && val <= TYPE_MAXIMUM (off_t)))
     try_help ("invalid --ignore-initial value '%s'", arg);
   if (ignore_initial[f] < val)
     ignore_initial[f] = val;
@@ -237,10 +237,11 @@ main (int argc, char **argv)
 
       case 'n':
         {
-          uintmax_t n;
-          if (xstrtoumax (optarg, 0, 0, &n, valid_suffixes) != LONGINT_OK)
+          intmax_t n;
+          if (xstrtoimax (optarg, 0, 0, &n, valid_suffixes) != LONGINT_OK
+              || n < 0)
             try_help ("invalid --bytes value '%s'", optarg);
-          if (n < bytes)
+          if (! (0 <= bytes && bytes < n))
             bytes = n;
         }
         break;
@@ -341,7 +342,7 @@ main (int argc, char **argv)
         s0 = 0;
       if (s1 < 0)
         s1 = 0;
-      if (s0 != s1 && MIN (s0, s1) < bytes)
+      if (s0 != s1 && (bytes < 0 || MIN (s0, s1) < bytes))
         exit (EXIT_FAILURE);
     }
 
@@ -379,7 +380,7 @@ cmp (void)
   bool at_line_start = true;
   off_t line_number = 1;	/* Line number (1...) of difference. */
   off_t byte_number = 1;	/* Byte number (1...) of difference. */
-  uintmax_t remaining = bytes;	/* Remaining number of bytes to compare.  */
+  intmax_t remaining = bytes;	/* Remaining bytes to compare, or -1.  */
   size_t read0, read1;		/* Number of bytes read from each file. */
   size_t first_diff;		/* Offset (0...) in buffers of 1st diff. */
   size_t smaller;		/* The lesser of 'read0' and 'read1'. */
@@ -433,7 +434,7 @@ cmp (void)
     {
       size_t bytes_to_read = buf_size;
 
-      if (remaining != UINTMAX_MAX)
+      if (0 <= remaining)
         {
           if (remaining < bytes_to_read)
             bytes_to_read = remaining;

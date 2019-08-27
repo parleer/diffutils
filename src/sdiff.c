@@ -1098,15 +1098,15 @@ interact (struct line_filter *diff,
       else
         {
           char *numend;
-          uintmax_t val;
+          intmax_t val;
           lin llen, rlen, lenmax;
           errno = 0;
-          val = strtoumax (diff_help + 1, &numend, 10);
-          if (LIN_MAX < val || errno || *numend != ',')
+          val = strtoimax (diff_help + 1, &numend, 10);
+          if (! (0 <= val && val <= LIN_MAX) || errno || *numend != ',')
             fatal (diff_help);
           llen = val;
-          val = strtoumax (numend + 1, &numend, 10);
-          if (LIN_MAX < val || errno || *numend)
+          val = strtoimax (numend + 1, &numend, 10);
+          if (! (0 <= val && val <= LIN_MAX) || errno || *numend)
             fatal (diff_help);
           rlen = val;
 

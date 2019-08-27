@@ -282,7 +282,7 @@ main (int argc, char **argv)
   bool show_c_function = false;
   char const *from_file = NULL;
   char const *to_file = NULL;
-  uintmax_t numval;
+  intmax_t numval;
   char *numend;
 
   /* Do our initializations.  */
@@ -350,8 +350,8 @@ main (int argc, char **argv)
           {
             if (optarg)
               {
-                numval = strtoumax (optarg, &numend, 10);
-                if (*numend)
+                numval = strtoimax (optarg, &numend, 10);
+                if (*numend || numval < 0)
                   try_help ("invalid context length '%s'", optarg);
                 if (CONTEXT_MAX < numval)
                   numval = CONTEXT_MAX;
@@ -525,7 +525,7 @@ main (int argc, char **argv)
           break;
 
         case 'W':
-          numval = strtoumax (optarg, &numend, 10);
+          numval = strtoimax (optarg, &numend, 10);
           if (! (0 < numval && numval <= SIZE_MAX) || *numend)
             try_help ("invalid width '%s'", optarg);
           if (width != numval)
@@ -554,8 +554,8 @@ main (int argc, char **argv)
           return EXIT_SUCCESS;
 
         case HORIZON_LINES_OPTION:
-          numval = strtoumax (optarg, &numend, 10);
-          if (*numend)
+          numval = strtoimax (optarg, &numend, 10);
+          if (*numend || numval < 0)
             try_help ("invalid horizon length '%s'", optarg);
           horizon_lines = MAX (horizon_lines, MIN (numval, LIN_MAX));
           break;
@@ -609,7 +609,7 @@ main (int argc, char **argv)
           break;
 
         case TABSIZE_OPTION:
-          numval = strtoumax (optarg, &numend, 10);
+          numval = strtoimax (optarg, &numend, 10);
           if (! (0 < numval && numval <= SIZE_MAX - GUTTER_WIDTH_MINIMUM)
               || *numend)
             try_help ("invalid tabsize '%s'", optarg);
