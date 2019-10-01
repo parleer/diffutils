@@ -218,4 +218,14 @@ case `LC_ALL=C cmp -b bad bug` in
   *) echo 'expected cmp -b to report a and u'; fail=1;;
 esac
 
+printf 'Jackdaws love my big sphinx of quartz!' > j1
+printf 'jackdaws love my big sphinx of quartz.' > j2
+cat <<'EOF' > exp2 || fail=1
+ 1 112 J    152 j
+38  41 !     56 .
+EOF
+cmp -bl j1 j2 > out2
+test $? -eq 1 || fail=1
+compare exp2 out2 || fail=1
+
 Exit $fail
