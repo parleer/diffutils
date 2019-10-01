@@ -394,7 +394,8 @@ cmp (void)
 
   if (comparison_type == type_all_diffs)
     {
-      off_t byte_number_max = MIN (bytes, TYPE_MAXIMUM (off_t));
+      off_t byte_number_max = (0 <= bytes && bytes <= TYPE_MAXIMUM (off_t)
+			       ? bytes : TYPE_MAXIMUM (off_t));
 
       for (f = 0; f < 2; f++)
         if (S_ISREG (stat_buf[f].st_mode))
