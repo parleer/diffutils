@@ -124,6 +124,7 @@ enum
   NO_IGNORE_FILE_NAME_CASE_OPTION,
   NORMAL_OPTION,
   SDIFF_MERGE_ASSIST_OPTION,
+  EXCLUDE_DIRECTORY_OPTION,
   STRIP_TRAILING_CR_OPTION,
   SUPPRESS_BLANK_EMPTY_OPTION,
   SUPPRESS_COMMON_LINES_OPTION,
@@ -210,6 +211,7 @@ static struct option const longopts[] =
   {"show-function-line", 1, 0, 'F'},
   {"side-by-side", 0, 0, 'y'},
   {"speed-large-files", 0, 0, 'H'},
+  {"exclude-directory", 0, 0, EXCLUDE_DIRECTORY_OPTION},
   {"starting-file", 1, 0, 'S'},
   {"strip-trailing-cr", 0, 0, STRIP_TRAILING_CR_OPTION},
   {"suppress-blank-empty", 0, 0, SUPPRESS_BLANK_EMPTY_OPTION},
@@ -596,6 +598,10 @@ main (int argc, char **argv)
           sdiff_merge_assist = true;
           break;
 
+        case EXCLUDE_DIRECTORY_OPTION:
+          exclude_directory = true;
+          break;
+
         case STRIP_TRAILING_CR_OPTION:
           strip_trailing_cr = true;
           break;
@@ -921,6 +927,7 @@ static char const * const option_help_msgid[] = {
   N_("    --no-ignore-file-name-case  consider case when comparing file names"),
   N_("-x, --exclude=PAT               exclude files that match PAT"),
   N_("-X, --exclude-from=FILE         exclude files that match any pattern in FILE"),
+  N_("    --exclude-directory         exclude directories matching exclude pattern"),
   N_("-S, --starting-file=FILE        start with FILE when comparing directories"),
   N_("    --from-file=FILE1           compare FILE1 to all operands;\n"
      "                                  FILE1 can be a directory"),

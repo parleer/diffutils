@@ -224,6 +224,9 @@ XTERN bool speed_large_files;
 /* Patterns that match file names to be excluded.  */
 XTERN struct exclude *excluded;
 
+/* Include directory as part of exclude matching. */
+XTERN bool exclude_directory;
+
 /* Don't discard lines.  This makes things slower (sometimes much
    slower) but will find a guaranteed minimal set of changes.  */
 XTERN bool minimal;

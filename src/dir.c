@@ -96,8 +96,15 @@ dir_read (struct file_data const *dir, struct dirdata *dirdata)
               && (d_name[1] == 0 || (d_name[1] == '.' && d_name[2] == 0)))
             continue;
 
-          if (excluded_file_name (excluded, d_name))
-            continue;
+          /* Exclude filename matches from diff */
+          if (exclude_directory) {
+           if (excluded_file_name (excluded,
+             file_name_concat(dir->name, d_name, NULL)))
+             continue;
+          } else {
+           if (excluded_file_name (excluded, d_name))
+             continue;
+          }
 
           while (data_alloc < data_used + d_size)
             {
